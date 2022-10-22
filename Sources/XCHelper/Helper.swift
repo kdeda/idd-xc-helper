@@ -9,22 +9,33 @@ import Foundation
 import Log4swift
 import SwiftCommons
 
-// MARK: - Helper -
+/**
+ Implementations for each HelperAction
+ */
 public struct Helper {
     var project: Project
     
     // MARK: - Private methods -
-    private func build(scheme schemeName: String, fromWorkSpaceAtPath workspacePath: String) {
-        // let arguments = ["-workspace", workspacePath, "-scheme", schemeName, "GCC_PREPROCESSOR_DEFINITIONS=\"IDD_PTRACE=1\"", "ARCHS=\"x86_64\"", "-configuration", "Release"]
-        // GCC_PREPROCESSOR_DEFINITIONS will squish the .xcconfig from Sparkle ...
-        // September 2019
-        //
-        // let arguments = ["-workspace", workspacePath, "-scheme", schemeName, "-configuration", "Release", "DEPLOYMENT_LOCATION=YES", "DSTROOT=/Users/kdeda/Development/build", "INSTALL_PATH=."]
-
+    /**
+     Build a particular Worksapce, for complex project you might have to build a few.
+     For now all the workspaces must output to the same project.buildProductsURL folder
+     */
+    private func build(workspace: Workspace) {
         Log4swift[Self.self].info("building ...")
+
+        // More arguments can be passed here as "KEY=Value" type thing
+        // ie: GCC_PREPROCESSOR_DEFINITIONS="IDD_PTRACE=1"
+        //
         let output = Process.fetchString(
-            taskURL: Config.XCODE_BUILD,
-            arguments: ["-workspace", workspacePath, "-scheme", schemeName, "-configuration", "Release"]
+            taskURL: Dependency.XCODE_BUILD,
+            arguments: [
+                "-workspace", workspace.workspaceURL.path,
+                "-scheme", workspace.scheme,
+                "-configuration", "Release",
+                "DSTROOT=\"\(project.buildProductsURL.path)\"",
+                "DWARF_DSYM_FOLDER_PATH=\"\(project.buildProductsURL.path)\"",
+                "INSTALL_PATH=."
+            ]
         )
         
         if output.range(of: "BUILD SUCCEEDED") == nil {
@@ -38,44 +49,41 @@ public struct Helper {
     private func copyPackageFiles() {
         Log4swift["xchelper"].info("package: '\(project.configName)'")
         
-        if Config.PACKAGE_BASE.fileExist {
-            _ = FileManager.default.removeItemIfExist(at: Config.PACKAGE_BASE)
-            Log4swift[Self.self].info("removed: '\(Config.PACKAGE_BASE.path)'")
+        if project.packageRootURL.fileExist {
+            _ = FileManager.default.removeItemIfExist(at: project.packageRootURL)
+            Log4swift[Self.self].info("removed: '\(project.packageRootURL.path)'")
         }
 
         // copy Products
         //
-        let packageNameProducts = Config.PACKAGE_BASE.appendingPathComponent("Products")
-        FileManager.default.createDirectoryIfMissing(at: packageNameProducts)
-        Log4swift[Self.self].info("created: '\(packageNameProducts.path)'")
+        FileManager.default.createDirectoryIfMissing(at: project.packageRootURL)
+        Log4swift[Self.self].info("created: '\(project.packageRootURL.path)'")
         
-        project.productFiles.forEach { (productFile) in
-            if let source = productFile["source"], let destination = productFile["destination"] {
-                let sourceURL = Config.BUILD_SOURCE.appendingPathComponent(source)
-                var destinationURL = Config.PACKAGE_BASE.appendingPathComponent(destination)
+        project.productFiles.forEach { productFile in
+            let destinationURL = project.packageRootURL.appendingPathComponent(productFile.destinationURL.path)
+            
+            if !destinationURL.fileExist {
+                FileManager.default.createDirectoryIfMissing(at: destinationURL)
+                Log4swift[Self.self].info("created: '\(destinationURL.path)'")
+            }
+            do {
+                let destinationURL = destinationURL.appendingPathComponent(productFile.sourceURL.lastPathComponent)
+                try FileManager.default.copyItem(atPath: productFile.sourceURL.path, toPath: destinationURL.path)
+                let relativePath = destinationURL.path.substring(after: project.packageRootURL.path) ?? "unknown"
                 
-                if !destinationURL.fileExist {
-                    FileManager.default.createDirectoryIfMissing(at: destinationURL)
-                    Log4swift[Self.self].info("created: '\(destinationURL.path)'")
-                }
-                do {
-                    destinationURL = destinationURL.appendingPathComponent(sourceURL.lastPathComponent)
-                    try FileManager.default.copyItem(atPath: sourceURL.path, toPath: destinationURL.path)
-                    let relativePath = destinationURL.path.substring(after: Config.PACKAGE_BASE.path) ?? "unknown"
-                    
-                    Log4swift[Self.self].info("copy: '\(sourceURL.path)' to: '..\(relativePath)'")
-                } catch {
-                    Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
-                }
+                Log4swift[Self.self].info("copy: '\(productFile.sourceURL.path)' to: '..\(relativePath)'")
+            } catch {
+                Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
             }
         }
 
         // strip .svn folders, .h files etc
         //
         do {
-            let items = try FileManager.default.subpathsOfDirectory(atPath: Config.PACKAGE_BASE.path)
+            let items = try FileManager.default.subpathsOfDirectory(atPath: project.packageRootURL.path)
+            
             items.forEach { (relativeFileName) in
-                let fileURL = Config.PACKAGE_BASE.appendingPathComponent(relativeFileName)
+                let fileURL = project.packageRootURL.appendingPathComponent(relativeFileName)
                 
                 if fileURL.isFileURL {
                     if fileURL.pathExtension == "h" || fileURL.lastPathComponent == ".DSStore" {
@@ -95,8 +103,8 @@ public struct Helper {
         
         // remove xattr
         //
-        let packageNameResources = project.pathToConfig.appendingPathComponent("Resources")
-        let output = Process.fetchString(taskURL: Config.XATTR, arguments: ["-cr", packageNameResources.path])
+        let packageNameResources = project.configURL.appendingPathComponent("Resources")
+        let output = Process.fetchString(taskURL: Dependency.XATTR, arguments: ["-cr", packageNameResources.path])
         
         Log4swift[Self.self].info(output)
     }
@@ -104,7 +112,7 @@ public struct Helper {
     private func removeSignature(file fileURL: URL) {
         let arguments = ["--remove-signature", fileURL.path]
         _ = Process
-            .fetchData(taskURL: Config.CODE_SIGN_COMMAND, arguments: arguments)
+            .fetchData(taskURL: Dependency.CODE_SIGN_COMMAND, arguments: arguments)
             .allString()
         //
         //        switch output {
@@ -117,14 +125,14 @@ public struct Helper {
     
     @discardableResult
     private func sign(file fileURL: URL, entitlments entitlmentsPath: String) -> Result<URL, Error> {
-        let tool = Config.CODE_SIGN_COMMAND
+        let tool = Dependency.CODE_SIGN_COMMAND
         var arguments = ["--verbose"]
         
         if entitlmentsPath.count > 0 {
             arguments += ["--entitlements", entitlmentsPath]
         }
         arguments += ["--force", "--timestamp", "--options=runtime", "--strict", "--sign"]
-        arguments += [project.certificateApplication]
+        arguments += [project.keyChain.developerIDApplication]
         arguments += [fileURL.path]
         
         _ = Process
@@ -137,7 +145,7 @@ public struct Helper {
                 exit(0)
             }
             .allString()
-            .flatMap { output -> Result<Bool, Process.ProcessError> in                
+            .flatMap { output -> Result<Bool, Process.ProcessError> in
                 guard output.range(of: "\(fileURL.lastPathComponent): signed") != .none,
                       output.range(of: "Mach-O") != .none
                 else {
@@ -163,7 +171,7 @@ public struct Helper {
     //
     private func signValidate(file fileURL: URL) -> Result<URL, Error> {
         _ = Process
-            .fetchData(taskURL: Config.CODE_SIGN_COMMAND, arguments: ["--verify", "--verbose", fileURL.path])
+            .fetchData(taskURL: Dependency.CODE_SIGN_COMMAND, arguments: ["--verify", "--verbose", fileURL.path])
             .mapError { processError in
                 Log4swift[Self.self].info("failed to sign: \(fileURL.path)")
                 Log4swift[Self.self].info("output: \(processError)")
@@ -290,7 +298,7 @@ public struct Helper {
     
     private func signPackageValidate() {
         let output = Process.fetchString(
-            taskURL: Config.PACKAGE_UTIL,
+            taskURL: Dependency.PACKAGE_UTIL,
             arguments: ["--check-signature", project.pathToPKG.path]
         )
         
@@ -309,10 +317,10 @@ public struct Helper {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
         let output = Process.fetchString(
-            taskURL: Config.PRODUCT_SIGN,
+            taskURL: Dependency.PRODUCT_SIGN,
             arguments: [
                 "--sign",
-                project.certificateInstaller,
+                project.keyChain.developerIDInstall,
                 project.pathToPKGAdorned.path,
                 project.pathToPKG.path
             ])
@@ -335,7 +343,7 @@ public struct Helper {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
         let script = URL.iddHomeDirectory.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/fixPackagePermissions.tcsh")
-        let output = Process.fetchString(taskURL: Config.SUDO, arguments: [script.path, project.packageName])
+        let output = Process.fetchString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
         
         if output.range(of: "completed") == nil {
             Log4swift[Self.self].info(output)
@@ -364,20 +372,20 @@ public struct Helper {
         // plutil -replace BundleIsRelocatable -bool NO component-list.plist
         //
         var output = Process.fetchString(
-            taskURL: Config.PACKAGE_BUILD,
+            taskURL: Dependency.PACKAGE_BUILD,
             arguments: [
                 "--identifier",
-                project.bundleIdentifier,
+                project.packageIdentifier,
                 "--version",
-                project.bundleShortVersionString,
+                project.versionInfo.bundleShortVersionString,
                 "--root",
-                Config.PACKAGE_BASE.appendingPathComponent("Products").path,
+                project.packageRootURL.appendingPathComponent("Products").path,
                 "--scripts",
-                project.pathToConfig.appendingPathComponent("Scripts").path,
+                project.configURL.appendingPathComponent("Scripts").path,
                 "--install-location",
                 "/",
                 "--component-plist",
-                project.pathToConfig.appendingPathComponent("component-list.plist").path,
+                project.configURL.appendingPathComponent("component-list.plist").path,
                 project.pathToPKGUnsigned.path
             ])
         guard output.range(of: ": Wrote package to") != .none
@@ -392,14 +400,14 @@ public struct Helper {
         // Adorn the package, ie: WhatSizeAdorned.pkg
         //
         output = Process.fetchString(
-            taskURL: Config.PRODUCT_BUILD,
+            taskURL: Dependency.PRODUCT_BUILD,
             arguments: [
                 "--distribution",
                 project.distributionURL.path,
                 "--resources",
-                project.pathToConfig.appendingPathComponent("Resources").path,
+                project.configURL.appendingPathComponent("Resources").path,
                 "--package-path",
-                Config.PACKAGE_BASE.path,
+                project.packageRootURL.path,
                 project.pathToPKGAdorned.path
             ])
         guard output.range(of: ": Wrote product to") != .none
@@ -412,17 +420,11 @@ public struct Helper {
         }
     }
 
-    // MARK: - Instance methods -
-    init(configName: String) {
-        let projectJson = Config
-            .SRIPTS_ROOT
-            .appendingPathComponent(configName)
-            .appendingPathComponent("Project.json")
-        if !projectJson.fileExist {
-            Log4swift[Self.self].info("missing path: '\(projectJson.path)'")
-            Log4swift[Self.self].info("missing path: '\(projectJson.path)'")
-        }
-        self.project = JSONDecoder.decode(Data.init(withURL:projectJson))!
+    /**
+     This should be the path to the Project.json
+     */
+    public init(configURL: URL) {
+        self.project = Project(configURL: configURL)!
     }
     
     public func handleAction(_ action: HelperAction) -> Helper {
@@ -445,25 +447,24 @@ public struct Helper {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         project.updateVersions()
     }
-    
-    // will remove the ../build/Release
-    //
+
+    /**
+     This will blast the buildProductsURL folder.
+     Keep in mind the buildProductsURL points to where xcode will put the products. ie: '/Users/kdeda/Development/build/Release'
+     But under it there might be other folders such as '../Intermediates.noindex' or '../Package'
+     */
     public func buildCode() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
-        
-//        let buildURL = Config.BUILD_SOURCE.appendingPathComponent("build/Release")
-//        if FileManager.default.removeItemIfExist(at: buildURL) {
-//            Log4swift[Self.self].info("removed: '\(buildURL.path)'")
-//        }
-//        if FileManager.default.createDirectoryIfMissing(at: buildURL) {
-//            Log4swift[Self.self].info("created: '\(buildURL.path)'")
-//        }
-        
-        project.workspaces.forEach { (workspace) in
-            if let scheme = workspace["scheme"], let workspace = workspace["workspace"] {
-                build(scheme: scheme, fromWorkSpaceAtPath: workspace)
-            }
+
+        let rootBuildURL = project.buildProductsURL.deletingLastPathComponent()
+        if FileManager.default.removeItemIfExist(at: rootBuildURL) {
+            Log4swift[Self.self].info("removed: '\(rootBuildURL.path)'")
         }
+        if FileManager.default.createDirectoryIfMissing(at: rootBuildURL) {
+            Log4swift[Self.self].info("created: '\(rootBuildURL.path)'")
+        }
+
+        project.workspaces.forEach(build(workspace:))
     }
     
     // http://lessons.livecode.com/a/1088036-signing-and-notarizing-macos-apps-for-gatekeeper
@@ -471,24 +472,22 @@ public struct Helper {
     public func signCode() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
-        project.productFilesToSign.forEach { relativeBuildFile in
-            let sourceURL = Config.BUILD_SOURCE.appendingPathComponent(relativeBuildFile)
-            
-            if sourceURL.pathExtension == "app" {
-                Log4swift[Self.self].info("signApplication: '\(relativeBuildFile)'")
-                signApplicationFrameworks(at: sourceURL)
-                signPlugins(at: sourceURL)
-                signLaunchServices(at: sourceURL)
+        project.productFiles.filter(\.requiresSignature).forEach { productFile in
+            if productFile.sourceURL.pathExtension == "app" {
+                Log4swift[Self.self].info("signApplication: '\(productFile.sourceURL.path)'")
+                signApplicationFrameworks(at: productFile.sourceURL)
+                signPlugins(at: productFile.sourceURL)
+                signLaunchServices(at: productFile.sourceURL)
                 
-                let fileName = sourceURL.deletingPathExtension().lastPathComponent
-                let fileURL = sourceURL.appendingPathComponent("Contents/MacOS/\(fileName)")
+                let fileName = productFile.sourceURL.deletingPathExtension().lastPathComponent
+                let fileURL = productFile.sourceURL.appendingPathComponent("Contents/MacOS/\(fileName)")
                 
                 removeSignature(file: fileURL)
-                sign(file: fileURL, entitlments: project.entitlementsFile)
-                sign(file: sourceURL, entitlments: project.entitlementsFile)
+                sign(file: fileURL, entitlments: productFile.entitlementsPath)
+                sign(file: productFile.sourceURL, entitlments: productFile.entitlementsPath)
             } else {
-                removeSignature(file: sourceURL)
-                sign(file: sourceURL, entitlments: "")
+                removeSignature(file: productFile.sourceURL)
+                sign(file: productFile.sourceURL, entitlments: "")
             }
         }
     }
@@ -499,7 +498,7 @@ public struct Helper {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
         let script = URL.iddHomeDirectory.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/chownExistingPackage.tcsh")
-        let output = Process.fetchString(taskURL: Config.SUDO, arguments: [script.path])
+        let output = Process.fetchString(taskURL: Dependency.SUDO, arguments: [script.path])
         
         if output.range(of: "completed") == nil {
             Log4swift[Self.self].info(output)
@@ -534,17 +533,16 @@ public struct Helper {
     public func notarizeApp() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
-        let apps = project.productFilesToSign.map(Config.BUILD_SOURCE.appendingPathComponent)
-        guard let appPath = apps.first
+        guard let productFile = project.productFiles.filter(\.requiresSignature).first
         else {
             exit(0)
         }
         
-        let appName = appPath.deletingPathExtension().lastPathComponent
-        let zipFile = appPath.deletingLastPathComponent().appendingPathComponent("\(appName.lowercased()).zip")
+        let appName = productFile.sourceURL.deletingPathExtension().lastPathComponent
+        let zipFile = productFile.sourceURL.deletingLastPathComponent().appendingPathComponent("\(appName.lowercased()).zip")
         _ = Process.fetchString(
-            taskURL: Config.DITTO,
-            arguments: ["-c", "-k", "--sequesterRsrc", "--keepParent", appPath.path, zipFile.path]
+            taskURL: Dependency.DITTO,
+            arguments: ["-c", "-k", "--sequesterRsrc", "--keepParent", productFile.sourceURL.path, zipFile.path]
         )
         
         zipFile.notarize(keychainProfile: project.notarytoolProfileName)
@@ -552,13 +550,13 @@ public struct Helper {
         // from Eskino
         // https://developer.apple.com/forums/thread/116812
         // we have to staple the app we just notarized
-        if !appPath.xcrunStaplerStapleAndValidate {
+        if !productFile.sourceURL.xcrunStaplerStapleAndValidate {
             exit(0)
         }
         // than create a new zip
         _ = Process.fetchString(
-            taskURL: Config.DITTO,
-            arguments: ["-c", "-k", "--sequesterRsrc", "--keepParent", appPath.path, zipFile.path]
+            taskURL: Dependency.DITTO,
+            arguments: ["-c", "-k", "--sequesterRsrc", "--keepParent", productFile.sourceURL.path, zipFile.path]
         )
     }
 
@@ -593,14 +591,14 @@ public struct Helper {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
         let script = URL.iddHomeDirectory.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/compressPackage.tcsh")
-        let output = Process.fetchString(taskURL: Config.SUDO, arguments: [script.path, project.packageName])
+        let output = Process.fetchString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
         if output.range(of: "completed") == nil {
             Log4swift[Self.self].info(output)
             exit(0)
         }
         
-        let packageFolder = "\(project.packageName)_\(project.bundleShortVersionString)"
-        let desktopBaseURL = Config.DESKTOP_PACKAGES.appendingPathComponent(packageFolder)
+        let packageFolder = "\(project.packageName)_\(project.versionInfo.bundleShortVersionString)"
+        let desktopBaseURL = Dependency.DESKTOP_PACKAGES.appendingPathComponent(packageFolder)
         
         FileManager.default.createDirectoryIfMissing(at: desktopBaseURL)
         do {
@@ -629,7 +627,7 @@ public struct Helper {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         Log4swift[Self.self].info("notes_xml: '\(project.notes_xml)'")
         do {
-            let fileURL = project.sparkleApplicationReleaseURL.appendingPathComponent("notes.xml")
+            let fileURL = project.sparkle.releaseURL.appendingPathComponent("notes.xml")
             try project.notes_xml.write(to: fileURL, atomically: true, encoding: .utf8)
             Log4swift[Self.self].info("updated: '\(fileURL.path)'")
         } catch {
@@ -638,14 +636,14 @@ public struct Helper {
         
         Log4swift[Self.self].info("sparklecast_xml: '\(project.sparklecast_xml)'")
         do {
-            let fileURL = project.sparkleApplicationReleaseURL.appendingPathComponent("sparklecast.xml")
+            let fileURL = project.sparkle.releaseURL.appendingPathComponent("sparklecast.xml")
             try project.sparklecast_xml.write(to: fileURL, atomically: true, encoding: .utf8)
             Log4swift[Self.self].info("updated: '\(fileURL.path)'")
         } catch {
             Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
         }
         
-        if project.bundleIdentifier.hasPrefix("com.id-design") {
+        if project.packageIdentifier.hasPrefix("com.id-design") {
             let phpInfo_xml: String = {
                 var rv = ""
                 
@@ -654,8 +652,8 @@ public struct Helper {
                 rv += "    autogenerated \(Date.init().description)\n"
                 rv += "-->\n"
                 rv += "<info>\n"
-                rv += "    <version>\(project.bundleShortVersionString)</version>\n"
-                rv += "    <releaseDate>\(project.sparkleReleaseDate)</releaseDate>\n"
+                rv += "    <version>\(project.versionInfo.bundleShortVersionString)</version>\n"
+                rv += "    <releaseDate>\(project.sparkle.releaseDate)</releaseDate>\n"
                 rv += "    <sizeInMB>\(project.pathToPKG.physicalSize.compactFormatted)</sizeInMB>\n"
                 rv += "</info>\n"
                 return rv
@@ -663,7 +661,7 @@ public struct Helper {
             
             Log4swift[Self.self].info("phpInfo_xml: '\(phpInfo_xml)'")
             do {
-                let fileURL = project.sparkleApplicationReleaseURL.appendingPathComponent("phpInfo.xml")
+                let fileURL = project.sparkle.releaseURL.appendingPathComponent("phpInfo.xml")
                 try phpInfo_xml.write(to: fileURL, atomically: true, encoding: .utf8)
                 Log4swift[Self.self].info("updated: '\(fileURL.path)'")
             } catch {
@@ -674,9 +672,9 @@ public struct Helper {
     
     public func packageTips() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
-        let packageFolder = "\(project.packageName)_\(project.bundleShortVersionString)"
+        let packageFolder = "\(project.packageName)_\(project.versionInfo.bundleShortVersionString)"
         
-        if project.bundleIdentifier.hasPrefix("com.id-design") {
+        if project.packageIdentifier.hasPrefix("com.id-design") {
             let WEBSERVER_ROOT = "/var/www/www.whatsizemac.com/downloads"
             let WEBSITE_URL = "https://www.whatsizemac.com"
             let WEBSITE_REPO = URL.iddHomeDirectory.appendingPathComponent("Development/git.id-design.com/website")
@@ -684,16 +682,16 @@ public struct Helper {
             Log4swift[Self.self].info("Manually upload/download ...")
             Log4swift[Self.self].info("Use these commands to upload packages into the public servers directly")
             Log4swift[Self.self].info("    --------------------------------")
-            Log4swift[Self.self].info("scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(project.sparkleSSHUserName):\(WEBSERVER_ROOT)/\(packageFolder.lowercased()).pkg")
+            Log4swift[Self.self].info("scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(project.sparkle.sshUserName):\(WEBSERVER_ROOT)/\(packageFolder.lowercased()).pkg")
             Log4swift[Self.self].info("\(WEBSITE_URL)/downloads/\(packageFolder.lowercased()).pkg")
             
             Log4swift[Self.self].info(" ")
             Log4swift[Self.self].info("Manually Update the Sparkle server directly ...")
             Log4swift[Self.self].info("These commands will update the public sparkle server, live")
             Log4swift[Self.self].info("    --------------------------------")
-            Log4swift[Self.self].info("scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz \(project.sparkleSSHUserName):\(project.sparkleApacheServerURL)/\(packageFolder.lowercased()).tgz")
-            Log4swift[Self.self].info("scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(project.sparkleSSHUserName):\(project.sparkleApacheServerURL)/\(project.packageName.lowercased()).pkg")
-            Log4swift[Self.self].info("scp -r \(project.sparkleApplicationReleaseURL.path)/ \(project.sparkleSSHUserName):\(project.sparkleApacheServerURL)/")
+            Log4swift[Self.self].info("scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL)/\(packageFolder.lowercased()).tgz")
+            Log4swift[Self.self].info("scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL)/\(project.packageName.lowercased()).pkg")
+            Log4swift[Self.self].info("scp -r \(project.sparkle.releaseURL.path)/ \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL)/")
             
             Log4swift[Self.self].info(" ")
             Log4swift[Self.self].info("Manually Update the local WebSite repo ...")
@@ -703,7 +701,7 @@ public struct Helper {
             Log4swift[Self.self].info("cp -R ~/Development/git.id-design.com/whatsize7/WhatSize/release \(WEBSITE_REPO.path)/www.whatsizemac.com/software/whatsize7/")
             Log4swift[Self.self].info("cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz \(WEBSITE_REPO.path)/www.whatsizemac.com/software/whatsize7/\(packageFolder.lowercased()).tgz")
             Log4swift[Self.self].info("cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(WEBSITE_REPO.path)/www.whatsizemac.com/software/whatsize7/\(project.packageName.lowercased()).pkg")
-        } else if project.bundleIdentifier.hasPrefix("com.other") {
+        } else if project.packageIdentifier.hasPrefix("com.other") {
         }
         
         Log4swift[Self.self].info(" ")

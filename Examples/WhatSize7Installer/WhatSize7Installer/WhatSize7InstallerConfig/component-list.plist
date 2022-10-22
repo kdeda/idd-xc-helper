@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>BundleHasStrictIdentifier</key>
+		<true/>
+		<key>BundleIsRelocatable</key>
+		<false/>
+		<key>BundleIsVersionChecked</key>
+		<true/>
+		<key>BundleOverwriteAction</key>
+		<string>upgrade</string>
+		<key>ChildBundles</key>
+		<array>
+			<dict>
+				<key>BundleOverwriteAction</key>
+				<string></string>
+				<key>ChildBundles</key>
+				<array>
+					<dict>
+						<key>BundleOverwriteAction</key>
+						<string></string>
+						<key>RootRelativeBundlePath</key>
+						<string>Applications/WhatSize.app/Contents/Resources/IDDObjectiveCLegacy_IDDObjectiveCLegacy.bundle</string>
+					</dict>
+					<dict>
+						<key>BundleOverwriteAction</key>
+						<string></string>
+						<key>ChildBundles</key>
+						<array>
+							<dict>
+								<key>BundleHasStrictIdentifier</key>
+								<true/>
+								<key>BundleOverwriteAction</key>
+								<string></string>
+								<key>RootRelativeBundlePath</key>
+								<string>Applications/WhatSize.app/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app</string>
+							</dict>
+						</array>
+						<key>RootRelativeBundlePath</key>
+						<string>Applications/WhatSize.app/Contents/Frameworks/Sparkle.framework</string>
+					</dict>
+				</array>
+				<key>RootRelativeBundlePath</key>
+				<string>Applications/WhatSize.app/Contents</string>
+			</dict>
+		</array>
+		<key>RootRelativeBundlePath</key>
+		<string>Applications/WhatSize.app</string>
+	</dict>
+</array>
+</plist>

@@ -47,7 +47,7 @@ extension URL {
          """
          */
         
-        let processOutput = Process.fetchString(taskURL: Config.XCRUN, arguments: arguments)
+        let processOutput = Process.fetchString(taskURL: Dependency.XCRUN, arguments: arguments)
         let tokens = processOutput.components(separatedBy: "\n")
         
         guard let index = tokens.firstIndex(where: { $0.contains("Processing complete") }),
@@ -67,7 +67,7 @@ extension URL {
      */
     var xcrunStaplerStaple: Bool {
         let output = Process.fetchString(
-            taskURL: Config.XCRUN,
+            taskURL: Dependency.XCRUN,
             arguments: ["stapler", "staple", "-v", self.path]
         )
         
@@ -85,7 +85,7 @@ extension URL {
      */
     var xcrunStaplerValidate: Bool {
         let output = Process.fetchString(
-            taskURL: Config.XCRUN,
+            taskURL: Dependency.XCRUN,
             arguments: ["stapler", "validate", "-v", self.path]
         )
         

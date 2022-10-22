@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# 
+
+# re-load the helper
+# -w to force it, in case it was disabled earlier
+#
+echo /usr/bin/sudo /bin/launchctl load -w /Library/LaunchDaemons/com.id-design.v7.whatsizehelper.plist
+/usr/bin/sudo /bin/launchctl load -w /Library/LaunchDaemons/com.id-design.v7.whatsizehelper.plist
+
+# this causes problems if no one is logged in
+# check if /usr/sbin/UserEventAgent -l Aqua is running
+#
+CONSOLE_USER=`ps axwww | grep UserEventAgent | grep Aqua | grep -v grep | awk '$1 {print $1}'`
+if [ "${CONSOLE_USER}" ]; then
+    echo /usr/bin/open -R /Applications/WhatSize.app
+    /usr/bin/open -R /Applications/WhatSize.app
+else
+    echo "no console user"
+fi
+
+exit 0

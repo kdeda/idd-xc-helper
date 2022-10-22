@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <pkg-ref id="$bundleIdentifier_placeholder"/>
+    <options hostArchitectures="arm64,x86_64" />
+    <options rootVolumeOnly="true" />
+    <title>$title_placeholder</title>
+    <welcome language="en" file="Welcome.rtf"/>
+    <license language="en" file="License.rtf"/>
+    <background file="background.png" alignment="bottomleft" scaling="proportional"/>
+    <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="$bundleIdentifier_placeholder"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="$bundleIdentifier_placeholder" visible="false">
+        <pkg-ref id="$bundleIdentifier_placeholder"/>
+    </choice>
+    <pkg-ref id="$bundleIdentifier_placeholder" version="$bundleShortVersionString_placeholder" onConclusion="none">WhatSizeUnsigned.pkg</pkg-ref>
+</installer-gui-script>

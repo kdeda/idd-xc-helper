@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+#
+
+DIR_NAME=`dirName $0`
+if [ $EUID -ne 0 ]; then
+    echo "Running as user: \""${USER}"\""
+    echo "You must execute these scripts as root/sudo."
+    # exit
+fi
+
+killApp() {
+    APP_NAME="$1"
+
+    echo killApp ${APP_NAME}
+    killall "${APP_NAME}"
+}
+
+killApp "WhatSize"
+if [ -e /Applications/WhatSize\ 7 ]; then
+    echo rm -rf /Applications/WhatSize\ 7
+    rm -rf /Applications/WhatSize\ 7
+fi
+
+# remove v6 helper, if there
+if [ -e /Library/PrivilegedHelperTools/com.id-design.whatsizehelper.uninstall.sh ]; then
+    echo /Library/PrivilegedHelperTools/com.id-design.whatsizehelper.uninstall.sh
+    /Library/PrivilegedHelperTools/com.id-design.whatsizehelper.uninstall.sh
+    
+    echo rm /Library/PrivilegedHelperTools/com.id-design.whatsizehelper.uninstall.sh
+    rm /Library/PrivilegedHelperTools/com.id-design.whatsizehelper.uninstall.sh
+fi
+
+# -w to force it
+#
+echo /usr/bin/sudo /bin/launchctl unload -w /Library/LaunchDaemons/com.id-design.v7.whatsizehelper.plist
+/usr/bin/sudo /bin/launchctl unload -w /Library/LaunchDaemons/com.id-design.v7.whatsizehelper.plist
+
+echo /usr/bin/sudo /bin/launchctl remove com.id-design.v7.whatsizehelper
+/usr/bin/sudo /bin/launchctl remove com.id-design.v7.whatsizehelper
+
+if [ -e /Library/PrivilegedHelperTools/com.id-design.v7.whatsizehelper ]; then
+    echo rm /Library/PrivilegedHelperTools/com.id-design.v7.whatsizehelper
+    rm /Library/PrivilegedHelperTools/com.id-design.v7.whatsizehelper
+fi
+
+if [ -e /Library/LaunchDaemons/com.id-design.v7.whatsizehelper.plist ]; then
+    echo rm /Library/LaunchDaemons/com.id-design.v7.whatsizehelper.plist
+    rm /Library/LaunchDaemons/com.id-design.v7.whatsizehelper.plist
+fi
+
+exit 0
