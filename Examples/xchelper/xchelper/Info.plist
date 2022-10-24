@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleGetInfoString</key>
+	<string>8.0.1, Copyright© 1997-2022 id designs, inc.</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.id-design.v8.xchelper</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>xchelper</string>
+	<key>CFBundleShortVersionString</key>
+	<string>8.0.1</string>
+	<key>CFBundleVersion</key>
+	<string>8010</string>
+	<key>IDDLogFileVersion</key>
+	<string>8010</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright© 1997-2022 id designs, inc.\nhttps://www.whatsizemac.com</string>
+</dict>
+</plist>

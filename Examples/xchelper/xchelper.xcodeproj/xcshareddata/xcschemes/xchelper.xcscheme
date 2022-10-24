@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "FBE720FA29043858009EA1BD"
-               BuildableName = "WhatSize7Installer"
-               BlueprintName = "WhatSize7Installer"
-               ReferencedContainer = "container:WhatSize7Installer.xcodeproj">
+               BuildableName = "xchelper"
+               BlueprintName = "xchelper"
+               ReferencedContainer = "container:xchelper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -46,25 +46,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "FBE720FA29043858009EA1BD"
-            BuildableName = "WhatSize7Installer"
-            BlueprintName = "WhatSize7Installer"
-            ReferencedContainer = "container:WhatSize7Installer.xcodeproj">
+            BuildableName = "xchelper"
+            BlueprintName = "xchelper"
+            ReferencedContainer = "container:xchelper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "-standardLog true"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-actions &quot;updateVersions, buildCode, signCode, createPackage, notarizePackage, updateSparkle, packageTips&quot;"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-actions &quot;createPackage&quot;"
-            isEnabled = "YES">
-         </CommandLineArgument>
-      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -77,9 +63,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "FBE720FA29043858009EA1BD"
-            BuildableName = "WhatSize7Installer"
-            BlueprintName = "WhatSize7Installer"
-            ReferencedContainer = "container:WhatSize7Installer.xcodeproj">
+            BuildableName = "xchelper"
+            BlueprintName = "xchelper"
+            ReferencedContainer = "container:xchelper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

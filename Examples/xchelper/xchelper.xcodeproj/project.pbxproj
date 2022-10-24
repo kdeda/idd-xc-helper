@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FB47A57E2904432400324F69 /* WhatSize7InstallerConfig in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB47A57D2904431E00324F69 /* WhatSize7InstallerConfig */; };
+		FB47A57E2904432400324F69 /* WhatSize7Config in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB47A57D2904431E00324F69 /* WhatSize7Config */; };
 		FBE720FF29043858009EA1BD /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE720FE29043858009EA1BD /* main.swift */; };
 		FBEBAAEC29043D6200DB92FF /* XCHelper in Frameworks */ = {isa = PBXBuildFile; productRef = FBEBAAEB29043D6200DB92FF /* XCHelper */; };
 /* End PBXBuildFile section */
@@ -19,15 +19,16 @@
 			dstPath = config;
 			dstSubfolderSpec = 6;
 			files = (
-				FB47A57E2904432400324F69 /* WhatSize7InstallerConfig in CopyFiles */,
+				FB47A57E2904432400324F69 /* WhatSize7Config in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		FB47A57D2904431E00324F69 /* WhatSize7InstallerConfig */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WhatSize7InstallerConfig; sourceTree = "<group>"; };
-		FBE720FB29043858009EA1BD /* WhatSize7Installer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = WhatSize7Installer; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB47A57D2904431E00324F69 /* WhatSize7Config */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WhatSize7Config; sourceTree = "<group>"; };
+		FBB91BA22906D78200F720BF /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FBE720FB29043858009EA1BD /* xchelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xchelper; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBE720FE29043858009EA1BD /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		FBEBAAEA29043CC200DB92FF /* XCHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = XCHelper; path = ../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -48,7 +49,7 @@
 			isa = PBXGroup;
 			children = (
 				FBEBAAEA29043CC200DB92FF /* XCHelper */,
-				FBE720FD29043858009EA1BD /* WhatSize7Installer */,
+				FBE720FD29043858009EA1BD /* xchelper */,
 				FBE720FC29043858009EA1BD /* Products */,
 				FBEBAAE529043C9F00DB92FF /* Frameworks */,
 			);
@@ -57,18 +58,19 @@
 		FBE720FC29043858009EA1BD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FBE720FB29043858009EA1BD /* WhatSize7Installer */,
+				FBE720FB29043858009EA1BD /* xchelper */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		FBE720FD29043858009EA1BD /* WhatSize7Installer */ = {
+		FBE720FD29043858009EA1BD /* xchelper */ = {
 			isa = PBXGroup;
 			children = (
 				FBE720FE29043858009EA1BD /* main.swift */,
-				FB47A57D2904431E00324F69 /* WhatSize7InstallerConfig */,
+				FBB91BA22906D78200F720BF /* Info.plist */,
+				FB47A57D2904431E00324F69 /* WhatSize7Config */,
 			);
-			path = WhatSize7Installer;
+			path = xchelper;
 			sourceTree = "<group>";
 		};
 		FBEBAAE529043C9F00DB92FF /* Frameworks */ = {
@@ -81,9 +83,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		FBE720FA29043858009EA1BD /* WhatSize7Installer */ = {
+		FBE720FA29043858009EA1BD /* xchelper */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FBE7210229043858009EA1BD /* Build configuration list for PBXNativeTarget "WhatSize7Installer" */;
+			buildConfigurationList = FBE7210229043858009EA1BD /* Build configuration list for PBXNativeTarget "xchelper" */;
 			buildPhases = (
 				FBE720F729043858009EA1BD /* Sources */,
 				FBE720F829043858009EA1BD /* Frameworks */,
@@ -93,12 +95,12 @@
 			);
 			dependencies = (
 			);
-			name = WhatSize7Installer;
+			name = xchelper;
 			packageProductDependencies = (
 				FBEBAAEB29043D6200DB92FF /* XCHelper */,
 			);
-			productName = WhatSize7Installer;
-			productReference = FBE720FB29043858009EA1BD /* WhatSize7Installer */;
+			productName = xchelper;
+			productReference = FBE720FB29043858009EA1BD /* xchelper */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -116,7 +118,7 @@
 					};
 				};
 			};
-			buildConfigurationList = FBE720F629043858009EA1BD /* Build configuration list for PBXProject "WhatSize7Installer" */;
+			buildConfigurationList = FBE720F629043858009EA1BD /* Build configuration list for PBXProject "xchelper" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -129,7 +131,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				FBE720FA29043858009EA1BD /* WhatSize7Installer */,
+				FBE720FA29043858009EA1BD /* xchelper */,
 			);
 		};
 /* End PBXProject section */
@@ -263,8 +265,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
 				DEVELOPMENT_TEAM = ME637H7ZM9;
 				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = xchelper/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.id-design.v8.xchelper";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -274,8 +279,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
 				DEVELOPMENT_TEAM = ME637H7ZM9;
 				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = xchelper/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.id-design.v8.xchelper";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -284,7 +292,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		FBE720F629043858009EA1BD /* Build configuration list for PBXProject "WhatSize7Installer" */ = {
+		FBE720F629043858009EA1BD /* Build configuration list for PBXProject "xchelper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FBE7210029043858009EA1BD /* Debug */,
@@ -293,7 +301,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FBE7210229043858009EA1BD /* Build configuration list for PBXNativeTarget "WhatSize7Installer" */ = {
+		FBE7210229043858009EA1BD /* Build configuration list for PBXNativeTarget "xchelper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FBE7210329043858009EA1BD /* Debug */,

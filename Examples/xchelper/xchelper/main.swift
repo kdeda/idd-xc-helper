@@ -24,10 +24,10 @@ Log4swiftConfig.configureLogs(defaultLogFile: IDDLogLogFileName, lock: "IDDLogLo
 /**
  We need to provide the path to the Project.json for this work
  the trick is to provide a CopyFiles step on the Xcode WhatSize7Installer target
- in there we copy the WhatSize7InstallerConfig, Destination: Executables
+ in there we copy the WhatSize7Config, Destination: Executables
  Subpath: config
- This will allow xcode to copy the WhatSize7InstallerConfig on a folder relative to the Bundle.main.executablePath
- Bundle.main.executablePath/../config/WhatSize7InstallerConfig
+ This will allow xcode to copy the WhatSize7Config on a folder relative to the Bundle.main.executablePath
+ Bundle.main.executablePath/../config/WhatSize7Config
  which we can than use.
  
  The required actions to create a WhatSize7package are
@@ -37,7 +37,7 @@ Log4swiftConfig.configureLogs(defaultLogFile: IDDLogLogFileName, lock: "IDDLogLo
  */
 
 let configURL = Bundle.main.executableURL!
-    .deletingLastPathComponent().appendingPathComponent("config/WhatSize7InstallerConfig/Project.json")
+    .deletingLastPathComponent().appendingPathComponent("config/WhatSize7Config/Project.json")
 
 fileprivate let actions = (UserDefaults.standard.string(forKey: "actions") ?? "updateVersions, buildCode, signCode, createPackage, notarizePackage, updateSparkle, packageTips")
     .replacingOccurrences(of: " ", with: "")
