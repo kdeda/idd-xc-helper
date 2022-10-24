@@ -56,7 +56,10 @@ extension Project {
             if current != modified {
                 let pathExtension = distributionURL.pathExtension
                 let projectName = distributionURL.deletingPathExtension().lastPathComponent + "_build_\(versionInfo.bundleShortVersionString)"
-                let rv = distributionURL.deletingLastPathComponent().appendingPathComponent(projectName).appendingPathExtension(pathExtension)
+                let rv = FileManager.default
+                    .temporaryDirectory
+                    .appendingPathComponent("\(configName)_\(projectName)")
+                    .appendingPathExtension(pathExtension)
                 
                 _ = FileManager.default.removeItemIfExist(at: rv)
                 try modified.write(to: rv, atomically: true, encoding: .utf8)
@@ -69,38 +72,6 @@ extension Project {
         }
         
         return distributionURL
-    }
-
-    // update the info.plist, save it if there are changes
-    public func updateInfo(at plistURL: URL) {
-        guard let existing = NSMutableDictionary(contentsOf: plistURL)
-        else {
-            Log4swift[Self.self].error("failed to load plist from: '\(plistURL.path)'")
-            return
-        }
-
-        let newValue = NSMutableDictionary(dictionary: existing)
-        
-        newValue["CFBundleGetInfoString"] = "\(versionInfo.bundleShortVersionString), \(versionInfo.bundleGetInfoString)"
-        newValue["CFBundleShortVersionString"] = versionInfo.bundleShortVersionString
-        newValue["CFBundleVersion"] = versionInfo.bundleVersion
-        newValue["NSHumanReadableCopyright"] = versionInfo.humanReadableCopyright
-        
-        guard newValue != existing
-        else {
-            Log4swift[Self.self].info("file: '\(plistURL.path)' is up todate")
-            return }
-        do {
-            try newValue.write(to: plistURL)
-            Log4swift[Self.self].info("saved: '\(plistURL.path)'")
-        } catch {
-            Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
-        }
-    }
-    
-    public func updateVersions() {
-        infoPlistFiles
-            .forEach(updateInfo(at:))
     }
 }
 

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FB47A57E2904432400324F69 /* WhatSize7Config in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB47A57D2904431E00324F69 /* WhatSize7Config */; };
 		FBE720FF29043858009EA1BD /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE720FE29043858009EA1BD /* main.swift */; };
 		FBEBAAEC29043D6200DB92FF /* XCHelper in Frameworks */ = {isa = PBXBuildFile; productRef = FBEBAAEB29043D6200DB92FF /* XCHelper */; };
 /* End PBXBuildFile section */
@@ -15,13 +14,12 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		FBE720F929043858009EA1BD /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 12;
-			dstPath = config;
-			dstSubfolderSpec = 6;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1;
+			dstSubfolderSpec = 0;
 			files = (
-				FB47A57E2904432400324F69 /* WhatSize7Config in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 

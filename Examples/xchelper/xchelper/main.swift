@@ -1,6 +1,6 @@
 //
 //  main.swift
-//  WhatSize7Installer
+//  xchelper
 //
 //  Created by Klajd Deda on 10/22/22.
 //
@@ -15,7 +15,7 @@ fileprivate let IDDLogLogFileName: String? = {
         return nil
     } else {
         Log4swift.getLogger("main").info("Starting as daemon ...")
-        return URL.iddHomeDirectory.appendingPathComponent("Library/Logs/WhatSize7Installer.log").path
+        return URL.iddHomeDirectory.appendingPathComponent("Library/Logs/xchelper.log").path
     }
 }()
 
@@ -23,7 +23,7 @@ Log4swiftConfig.configureLogs(defaultLogFile: IDDLogLogFileName, lock: "IDDLogLo
 
 /**
  We need to provide the path to the Project.json for this work
- the trick is to provide a CopyFiles step on the Xcode WhatSize7Installer target
+ The trick here is to provide a CopyFiles step on the Xcode xchelper target
  in there we copy the WhatSize7Config, Destination: Executables
  Subpath: config
  This will allow xcode to copy the WhatSize7Config on a folder relative to the Bundle.main.executablePath
@@ -36,8 +36,29 @@ Log4swiftConfig.configureLogs(defaultLogFile: IDDLogLogFileName, lock: "IDDLogLo
  -actions "buildCode"
  */
 
-let configURL = Bundle.main.executableURL!
-    .deletingLastPathComponent().appendingPathComponent("config/WhatSize7Config/Project.json")
+fileprivate let toolName = Bundle.main.executableURL?.lastPathComponent ?? "unknown"
+fileprivate let project = UserDefaults.standard.string(forKey: "project") ?? ""
+
+guard !project.isEmpty
+else {
+    Log4swift["main"].info("usage: '\(toolName) -project pathToProject.json'")
+    Log4swift["main"].info("       where pathToProject.json is an absolute path or user relative path to the Project.json for this run")
+    exit(0)
+}
+
+/// make sure we have full disk access
+fileprivate let output = Process.fetchString(taskURL: URL(fileURLWithPath: "/bin/date"), arguments: [])
+guard !output.isEmpty,
+      FileManager.default.hasFullDiskAccess
+else {
+    Log4swift["main"].info("usage: '\(toolName)  Pleae correct Full Disk Access and try again")
+    Log4swift["main"].info("       open  x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+    exit(0)
+}
+
+Log4swift["main"].info("--------------------------------")
+Log4swift["main"].info("-project '\(project)'")
+fileprivate let configURL = URL(string: project)!.expandingTilde!
 
 fileprivate let actions = (UserDefaults.standard.string(forKey: "actions") ?? "updateVersions, buildCode, signCode, createPackage, notarizePackage, updateSparkle, packageTips")
     .replacingOccurrences(of: " ", with: "")

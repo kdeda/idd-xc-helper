@@ -16,49 +16,12 @@ public struct Helper {
     var project: Project
     
     // MARK: - Private methods -
-    /**
-     Build a particular Worksapce, for complex project you might have to build a few.
-     For now all the workspaces must output to the same project.buildProductsURL folder
-     */
-    private func build(workspace: Workspace) {
-        Log4swift[Self.self].info("building ...")
-
-        // More arguments can be passed here as "KEY=Value" type thing
-        // ie: GCC_PREPROCESSOR_DEFINITIONS="IDD_PTRACE=1"
-        //
-        let output = Process.fetchString(
-            taskURL: Dependency.XCODE_BUILD,
-            arguments: [
-                "-workspace", workspace.workspaceURL.path,
-                "-scheme", workspace.scheme,
-                "-configuration", "Release",
-                "DSTROOT=\"\(project.buildProductsURL.path)\"",
-                "DWARF_DSYM_FOLDER_PATH=\"\(project.buildProductsURL.path)\"",
-                "INSTALL_PATH=."
-            ]
-        )
-        
-        if output.range(of: "BUILD SUCCEEDED") == nil {
-            Log4swift[Self.self].info("failed build ...")
-            Log4swift[Self.self].info(output)
-            exit(0)
-        }
-        Log4swift[Self.self].info("completed build")
-    }
     
     private func copyPackageFiles() {
         Log4swift["xchelper"].info("package: '\(project.configName)'")
         
-        if project.packageRootURL.fileExist {
-            _ = FileManager.default.removeItemIfExist(at: project.packageRootURL)
-            Log4swift[Self.self].info("removed: '\(project.packageRootURL.path)'")
-        }
-
         // copy Products
         //
-        FileManager.default.createDirectoryIfMissing(at: project.packageRootURL)
-        Log4swift[Self.self].info("created: '\(project.packageRootURL.path)'")
-        
         project.productFiles.forEach { productFile in
             let destinationURL = project.packageRootURL.appendingPathComponent(productFile.destinationURL.path)
             
@@ -107,193 +70,6 @@ public struct Helper {
         let output = Process.fetchString(taskURL: Dependency.XATTR, arguments: ["-cr", packageNameResources.path])
         
         Log4swift[Self.self].info(output)
-    }
-    
-    private func removeSignature(file fileURL: URL) {
-        let arguments = ["--remove-signature", fileURL.path]
-        _ = Process
-            .fetchData(taskURL: Dependency.CODE_SIGN_COMMAND, arguments: arguments)
-            .allString()
-        //
-        //        switch output {
-        //        case .success(let output):
-        //            Log4swift[Self.self].info("output: \(output)")
-        //        case .failure(let error):
-        //            Log4swift[Self.self].info("output: \(error)")
-        //        }
-    }
-    
-    @discardableResult
-    private func sign(file fileURL: URL, entitlments entitlmentsPath: String) -> Result<URL, Error> {
-        let tool = Dependency.CODE_SIGN_COMMAND
-        var arguments = ["--verbose"]
-        
-        if entitlmentsPath.count > 0 {
-            arguments += ["--entitlements", entitlmentsPath]
-        }
-        arguments += ["--force", "--timestamp", "--options=runtime", "--strict", "--sign"]
-        arguments += [project.keyChain.developerIDApplication]
-        arguments += [fileURL.path]
-        
-        _ = Process
-            .fetchData(taskURL: tool, arguments: arguments)
-            .mapError { processError in
-                Log4swift[Self.self].info("failed to sign: \(fileURL.path)")
-                Log4swift[Self.self].info("output: \(processError)")
-                Log4swift[Self.self].info("")
-                Log4swift[Self.self].info("")
-                exit(0)
-            }
-            .allString()
-            .flatMap { output -> Result<Bool, Process.ProcessError> in
-                guard output.range(of: "\(fileURL.lastPathComponent): signed") != .none,
-                      output.range(of: "Mach-O") != .none
-                else {
-                    Log4swift[Self.self].info("output: \(output)")
-                    return .failure(.error("failed to sign: \(fileURL.path)"))
-                }
-                return .success(true)
-            }
-        // we really want to stop cold ...
-            .mapError { error -> Process.ProcessError in
-                Log4swift[Self.self].info("\(error)")
-                Log4swift[Self.self].info("")
-                Log4swift[Self.self].info("")
-                exit(0)
-            }
-        
-        return signValidate(file: fileURL)
-    }
-    
-    // How to inspect entitlements
-    // codesign -d --entitlements - [binary]
-    // /usr/bin/codesign --verify --verbose /Users/kdeda/Development/build/Debug/WhatSize.app
-    //
-    private func signValidate(file fileURL: URL) -> Result<URL, Error> {
-        _ = Process
-            .fetchData(taskURL: Dependency.CODE_SIGN_COMMAND, arguments: ["--verify", "--verbose", fileURL.path])
-            .mapError { processError in
-                Log4swift[Self.self].info("failed to sign: \(fileURL.path)")
-                Log4swift[Self.self].info("output: \(processError)")
-                Log4swift[Self.self].info("")
-                Log4swift[Self.self].info("")
-                exit(0)
-            }
-            .allString()
-            .flatMap { output -> Result<Bool, Process.ProcessError> in
-                guard output.range(of: "satisfies its Designated Requirement") == .none
-                else { return .success(true) }
-                
-                guard output.range(of: "valid on disk") != .none,
-                      output.range(of: "Mach-O") != .none
-                else {
-                    Log4swift[Self.self].info("output: \(output)")
-                    return .failure(.error("failed to sign: \(fileURL.path)"))
-                }
-                return .success(true)
-            }
-        // we really want to stop cold ...
-            .mapError { error -> Process.ProcessError in
-                Log4swift[Self.self].info("\(error)")
-                Log4swift[Self.self].info("")
-                Log4swift[Self.self].info("")
-                exit(0)
-            }
-        
-        Log4swift[Self.self].info("   validated signature: \(fileURL.path)")
-        return .success(fileURL)
-    }
-    
-    // this is url to a .app
-    //
-    private func signApplicationFrameworks(at applicationURL: URL) {
-        do {
-            let applicationURL = applicationURL.appendingPathComponent("Contents/Frameworks")
-            let fileNames = try FileManager.default.contentsOfDirectory(atPath: applicationURL.path)
-            
-            fileNames.forEach { fileName in
-                let parentURL = applicationURL.appendingPathComponent(fileName)
-                let fileType = parentURL.pathExtension
-                let fileName = parentURL.deletingPathExtension().lastPathComponent
-                
-                switch fileType {
-                case "framework":
-                    let fileURL = parentURL.appendingPathComponent("Versions/A")
-                    let headersURL = parentURL.appendingPathComponent("Versions/A/Headers")
-                    
-                    Log4swift[Self.self].info("fileURL: '\(fileURL)'")
-                    if fileName == "Sparkle" {
-                        let fileop = parentURL.appendingPathComponent("Versions/A/Resources/Autoupdate.app/Contents/MacOS/fileop")
-                        removeSignature(file: fileop)
-                        sign(file: fileop, entitlments: "")
-                        
-                        let autoupdate = parentURL.appendingPathComponent("Versions/A/Resources/Autoupdate.app/Contents/MacOS/Autoupdate")
-                        removeSignature(file: autoupdate)
-                        sign(file: autoupdate, entitlments: "")
-                    }
-                    // remove headers on installed code
-                    let headerFiles = (try? FileManager.default.contentsOfDirectory(atPath: headersURL.path)) ?? []
-                    headerFiles.forEach { headerFile in
-                        try? FileManager.default.removeItem(atPath: headersURL.appendingPathComponent(headerFile).path)
-                    }
-                    removeSignature(file: fileURL)
-                    sign(file: fileURL, entitlments: "")
-                case "dylib":
-                    removeSignature(file: parentURL)
-                    sign(file: parentURL, entitlments: "")
-                default:
-                    Log4swift[Self.self].error("ignore: '\(parentURL)'")
-                }
-            }
-        } catch {
-            Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
-        }
-    }
-    
-    private func signPlugins(at applicationURL: URL) {
-        do {
-            let applicationURL = applicationURL.appendingPathComponent("Contents/Resources/Plugins")
-            guard applicationURL.fileExist
-            else {
-                Log4swift[Self.self].error("Found no plugins under: '\(applicationURL.path)'")
-                return
-            }
-            let fileNames = try FileManager.default.subpathsOfDirectory(atPath: applicationURL.path)
-            let knownPlugins = Set(["FooPlugin.extension"])
-            
-            _ = fileNames
-                .map { applicationURL.appendingPathComponent($0) }
-                .filter { knownPlugins.contains($0.lastPathComponent) }
-                .compactMap { (pluginFileURL) -> Result<URL, Error>? in
-                    removeSignature(file: pluginFileURL)
-                    let result = sign(file: pluginFileURL, entitlments: "")
-                    switch result {
-                    case .success(_):
-                        return .none
-                    case .failure(let error):
-                        print("error: '\(error)' on: '\(pluginFileURL)'")
-                        return result
-                    }
-                }
-        } catch {
-            Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
-        }
-    }
-    
-    private func signLaunchServices(at applicationURL: URL) {
-        do {
-            let applicationURL = applicationURL.appendingPathComponent("Contents/Library/LaunchServices")
-            let fileNames = try FileManager.default.contentsOfDirectory(atPath: applicationURL.path)
-            
-            fileNames.forEach { (fileName) in
-                let parentURL = applicationURL.appendingPathComponent(fileName)
-                
-                removeSignature(file: parentURL)
-                sign(file: parentURL, entitlments: "")
-            }
-        } catch {
-            Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
-        }
     }
     
     private func signPackageValidate() {
@@ -442,57 +218,9 @@ public struct Helper {
         }
         return self
     }
-    
-    public func updateVersions() {
-        Log4swift[Self.self].info("package: '\(project.configName)'")
-        project.updateVersions()
-    }
 
-    /**
-     This will blast the buildProductsURL folder.
-     Keep in mind the buildProductsURL points to where xcode will put the products. ie: '/Users/kdeda/Development/build/Release'
-     But under it there might be other folders such as '../Intermediates.noindex' or '../Package'
-     */
-    public func buildCode() {
-        Log4swift[Self.self].info("package: '\(project.configName)'")
-
-        let rootBuildURL = project.buildProductsURL.deletingLastPathComponent()
-        if FileManager.default.removeItemIfExist(at: rootBuildURL) {
-            Log4swift[Self.self].info("removed: '\(rootBuildURL.path)'")
-        }
-        if FileManager.default.createDirectoryIfMissing(at: rootBuildURL) {
-            Log4swift[Self.self].info("created: '\(rootBuildURL.path)'")
-        }
-
-        project.workspaces.forEach(build(workspace:))
-    }
-    
-    // http://lessons.livecode.com/a/1088036-signing-and-notarizing-macos-apps-for-gatekeeper
-    //
-    public func signCode() {
-        Log4swift[Self.self].info("package: '\(project.configName)'")
-        
-        project.productFiles.filter(\.requiresSignature).forEach { productFile in
-            if productFile.sourceURL.pathExtension == "app" {
-                Log4swift[Self.self].info("signApplication: '\(productFile.sourceURL.path)'")
-                signApplicationFrameworks(at: productFile.sourceURL)
-                signPlugins(at: productFile.sourceURL)
-                signLaunchServices(at: productFile.sourceURL)
-                
-                let fileName = productFile.sourceURL.deletingPathExtension().lastPathComponent
-                let fileURL = productFile.sourceURL.appendingPathComponent("Contents/MacOS/\(fileName)")
-                
-                removeSignature(file: fileURL)
-                sign(file: fileURL, entitlments: productFile.entitlementsPath)
-                sign(file: productFile.sourceURL, entitlments: productFile.entitlementsPath)
-            } else {
-                removeSignature(file: productFile.sourceURL)
-                sign(file: productFile.sourceURL, entitlments: "")
-            }
-        }
-    }
-    
     // should run as root
+    // will blast and recreate the Package folder at project.packageRootURL
     //
     public func createPackage() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
@@ -504,7 +232,14 @@ public struct Helper {
             Log4swift[Self.self].info(output)
             exit(0)
         }
-        
+
+        if FileManager.default.removeItemIfExist(at: project.packageRootURL) {
+            Log4swift[Self.self].info("removed: '\(project.packageRootURL.path)'")
+        }
+        if FileManager.default.createDirectoryIfMissing(at: project.packageRootURL) {
+            Log4swift[Self.self].info("created: '\(project.packageRootURL.path)'")
+        }
+
         copyPackageFiles()
         fixPermissions()
         makePackage()
