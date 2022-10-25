@@ -1,11 +1,11 @@
 import XCTest
-@testable import XCHelper
+@testable import XCSwiftHelper
 
-final class XCHelperTests: XCTestCase {
+final class XCSwiftHelperTests: XCTestCase {
     func testExample() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(XCHelper.Dependency.version, "1.0.0")
+        XCTAssertEqual(XCSwiftHelper.Dependency.version, "1.0.0")
     }
 }

@@ -57,20 +57,12 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-actions buildCode"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-project ~/Development/backblaze/BackblazeDMGConfig/Project.json"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-project ~/Development/git.id-design.com/spm/idd-xchelper/Examples/xchelper/xchelper/WhatSize7Config/Project.json"
+            argument = "-config WhatSize7"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-project ~/Development/git.id-design.com/installer_tools/products/WhatSize8Config/Project.json"
-            isEnabled = "NO">
+            argument = "-actions buildCode"
+            isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>

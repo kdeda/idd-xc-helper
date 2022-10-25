@@ -7,7 +7,7 @@
 
 import Foundation
 import Log4swift
-import XCHelper
+import XCSwiftHelper
 
 fileprivate let IDDLogLogFileName: String? = {
     if UserDefaults.standard.bool(forKey: "standardLog") {
@@ -24,11 +24,15 @@ Log4swiftConfig.configureLogs(defaultLogFile: IDDLogLogFileName, lock: "IDDLogLo
 /**
  We need to provide the path to the Project.json for this work
  The trick here is to provide a CopyFiles step on the Xcode xchelper target
- in there we copy the WhatSize7Config, Destination: Executables
+ where we copy the WhatSize7, Destination: Executables
  Subpath: config
- This will allow xcode to copy the WhatSize7Config on a folder relative to the Bundle.main.executablePath
- Bundle.main.executablePath/../config/WhatSize7Config
+ This will allow xcode to copy the WhatSize7 on a folder relative to the Bundle.main.executablePath
+ Bundle.main.executablePath/../config/WhatSize7
  which we can than use.
+
+ This is a convenience and keeps the configs well formed inside this app.
+ Yes we could keep the configs outside scatered in the file system, but
+ this enforces more encapsulation.
  
  The required actions to create a WhatSize7package are
  -actions "updateVersions, buildCode, signCode, createPackage, notarizePackage, updateSparkle, packageTips"
@@ -36,37 +40,49 @@ Log4swiftConfig.configureLogs(defaultLogFile: IDDLogLogFileName, lock: "IDDLogLo
  -actions "buildCode"
  */
 
-fileprivate let toolName = Bundle.main.executableURL?.lastPathComponent ?? "unknown"
-fileprivate let project = UserDefaults.standard.string(forKey: "project") ?? ""
-
-guard !project.isEmpty
+fileprivate let config = UserDefaults.standard.string(forKey: "config") ?? ""
+guard !config.isEmpty
 else {
-    Log4swift["main"].info("usage: '\(toolName) -project pathToProject.json'")
-    Log4swift["main"].info("       where pathToProject.json is an absolute path or user relative path to the Project.json for this run")
+    let toolName = Bundle.main.executableURL!.lastPathComponent
+
+    Log4swift["main"].info("usage: '\(toolName) -config WhatSize7'")
+    Log4swift["main"].info("       where WhatSize7 should be a valid name.")
     exit(0)
 }
+
+fileprivate let projectURL = Bundle.main.executableURL!
+    .deletingLastPathComponent().appendingPathComponent("config/\(config)/Project.json")
+guard projectURL.fileExist
+else {
+    let toolName = Bundle.main.executableURL!.lastPathComponent
+
+    Log4swift["main"].info("usage: '\(toolName) -config WhatSize7'")
+    Log4swift["main"].info("       where WhatSize7 should be a valid name.")
+    exit(0)
+}
+
+Log4swift["main"].info("--------------------------------")
+Log4swift["main"].info("-config '\(config)' projectURL: '\(projectURL.path)'")
 
 /// make sure we have full disk access
 fileprivate let output = Process.fetchString(taskURL: URL(fileURLWithPath: "/bin/date"), arguments: [])
 guard !output.isEmpty,
       FileManager.default.hasFullDiskAccess
 else {
-    Log4swift["main"].info("usage: '\(toolName)  Pleae correct Full Disk Access and try again")
-    Log4swift["main"].info("       open  x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+    Log4swift["main"].info("Please give this tool Full Disk Access and try again")
+    Log4swift["main"].info("    open x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+    Log4swift["main"].info("    open \(Bundle.main.executableURL!.deletingLastPathComponent().path)")
+    Log4swift["main"].info("    and add \(Bundle.main.executableURL!.path) to the list of allowed binaries")
     exit(0)
 }
 
-Log4swift["main"].info("--------------------------------")
-Log4swift["main"].info("-project '\(project)'")
-fileprivate let configURL = URL(string: project)!.expandingTilde!
 
 fileprivate let actions = (UserDefaults.standard.string(forKey: "actions") ?? "updateVersions, buildCode, signCode, createPackage, notarizePackage, updateSparkle, packageTips")
     .replacingOccurrences(of: " ", with: "")
     .components(separatedBy: ",")
     .compactMap(HelperAction.init(rawValue:))
 
-fileprivate let projectJSON = Bundle.main.executablePath
-fileprivate let helper = Helper(configURL: configURL)
+fileprivate let helper = Helper(configURL: projectURL)
 fileprivate var totalElapsedTimeInMilliseconds = 0.0
 
 actions.forEach { helperAction in
