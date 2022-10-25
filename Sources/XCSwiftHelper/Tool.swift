@@ -86,10 +86,6 @@ public struct Tool {
         guard !output.isEmpty,
               FileManager.default.hasFullDiskAccess
         else {
-            Log4swift["main"].info("Please give this tool Full Disk Access and try again")
-            Log4swift["main"].info("    open x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
-            Log4swift["main"].info("    open \(Bundle.main.executableURL!.deletingLastPathComponent().path)")
-            Log4swift["main"].info("    and add \(Bundle.main.executableURL!.path) to the list of allowed binaries")
             exit(0)
         }
     }
