@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "FBE720FA29043858009EA1BD"
-               BuildableName = "xchelper"
-               BlueprintName = "xchelper"
+               BuildableName = "idd-xchelper"
+               BlueprintName = "idd-xchelper"
                ReferencedContainer = "container:xchelper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,8 +46,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "FBE720FA29043858009EA1BD"
-            BuildableName = "xchelper"
-            BlueprintName = "xchelper"
+            BuildableName = "idd-xchelper"
+            BlueprintName = "idd-xchelper"
             ReferencedContainer = "container:xchelper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -77,8 +77,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "FBE720FA29043858009EA1BD"
-            BuildableName = "xchelper"
-            BlueprintName = "xchelper"
+            BuildableName = "idd-xchelper"
+            BlueprintName = "idd-xchelper"
             ReferencedContainer = "container:xchelper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

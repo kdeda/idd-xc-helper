@@ -28,7 +28,7 @@
 /* Begin PBXFileReference section */
 		FB47A57D2904431E00324F69 /* WhatSize7 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WhatSize7; sourceTree = "<group>"; };
 		FBB91BA22906D78200F720BF /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FBE720FB29043858009EA1BD /* xchelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xchelper; sourceTree = BUILT_PRODUCTS_DIR; };
+		FBE720FB29043858009EA1BD /* idd-xchelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "idd-xchelper"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBE720FE29043858009EA1BD /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		FBEBAAEA29043CC200DB92FF /* XCSwiftHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = XCSwiftHelper; path = ../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,7 +58,7 @@
 		FBE720FC29043858009EA1BD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FBE720FB29043858009EA1BD /* xchelper */,
+				FBE720FB29043858009EA1BD /* idd-xchelper */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -83,9 +83,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		FBE720FA29043858009EA1BD /* xchelper */ = {
+		FBE720FA29043858009EA1BD /* idd-xchelper */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FBE7210229043858009EA1BD /* Build configuration list for PBXNativeTarget "xchelper" */;
+			buildConfigurationList = FBE7210229043858009EA1BD /* Build configuration list for PBXNativeTarget "idd-xchelper" */;
 			buildPhases = (
 				FBE720F729043858009EA1BD /* Sources */,
 				FBE720F829043858009EA1BD /* Frameworks */,
@@ -95,12 +95,12 @@
 			);
 			dependencies = (
 			);
-			name = xchelper;
+			name = "idd-xchelper";
 			packageProductDependencies = (
 				FBEBAAEB29043D6200DB92FF /* XCSwiftHelper */,
 			);
 			productName = xchelper;
-			productReference = FBE720FB29043858009EA1BD /* xchelper */;
+			productReference = FBE720FB29043858009EA1BD /* idd-xchelper */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -131,7 +131,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				FBE720FA29043858009EA1BD /* xchelper */,
+				FBE720FA29043858009EA1BD /* idd-xchelper */,
 			);
 		};
 /* End PBXProject section */
@@ -301,7 +301,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FBE7210229043858009EA1BD /* Build configuration list for PBXNativeTarget "xchelper" */ = {
+		FBE7210229043858009EA1BD /* Build configuration list for PBXNativeTarget "idd-xchelper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FBE7210329043858009EA1BD /* Debug */,
