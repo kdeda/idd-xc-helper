@@ -63,6 +63,7 @@ public struct Tool {
             let toolName = Bundle.main.executableURL!.lastPathComponent
 
             Log4swift["main"].info("usage: '\(toolName) -config [\(knownConfigs.joined(separator: " | "))]'")
+            Log4swift["main"].info("       you provided an invalid config value: '\(config)'")
             Log4swift["main"].info("       valid configs are: '\(knownConfigs.joined(separator: " | "))'")
             exit(0)
         }
