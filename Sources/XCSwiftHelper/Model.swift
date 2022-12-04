@@ -41,6 +41,7 @@ public struct ProductFile: Codable {
 public struct KeyChain: Codable {
     let developerIDApplication: String  // ie: '"Developer ID Application: ID-DESIGN INC. (ME637H7ZM9)"'
     let developerIDInstall: String      // ie: '"Developer ID Installer: ID-DESIGN INC. (ME637H7ZM9)"'
+    let keychainProfile: String         // See: URL.notarize(keychainProfile:) for more info
 }
 
 public struct Sparkle: Codable {

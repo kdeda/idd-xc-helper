@@ -253,7 +253,7 @@ public struct Helper {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
         let pkgFile = project.pathToPKG
-        pkgFile.notarize(keychainProfile: project.notarytoolProfileName)
+        pkgFile.notarize(keychainProfile: project.keyChain.keychainProfile)
         if !pkgFile.xcrunStaplerStapleAndValidate {
             exit(0)
         }
@@ -280,7 +280,7 @@ public struct Helper {
             arguments: ["-c", "-k", "--sequesterRsrc", "--keepParent", productFile.sourceURL.path, zipFile.path]
         )
         
-        zipFile.notarize(keychainProfile: project.notarytoolProfileName)
+        zipFile.notarize(keychainProfile: project.keyChain.keychainProfile)
         
         // from Eskino
         // https://developer.apple.com/forums/thread/116812
@@ -316,7 +316,7 @@ public struct Helper {
 //        _ = Process.fetchString(taskURL: tool, arguments: arguments)
         
         let diskImage = URL(fileURLWithPath: "/Users/cdeda/Development/backblaze/bzmono/www/java/clientdownload/bzinstall-mac-8.5.0.634-ca000.backblaze.com.dmg")
-        diskImage.notarize(keychainProfile: project.notarytoolProfileName)
+        diskImage.notarize(keychainProfile: project.keyChain.keychainProfile)
         if !diskImage.xcrunStaplerStapleAndValidate {
             exit(0)
         }
@@ -408,40 +408,44 @@ public struct Helper {
     public func packageTips() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         let packageFolder = "\(project.packageName)_\(project.versionInfo.bundleShortVersionString)"
-        
+        var packageTips = [String]()
+
         if project.packageIdentifier.hasPrefix("com.id-design") {
             let WEBSERVER_ROOT = "/var/www/www.whatsizemac.com/downloads"
             let WEBSITE_URL = "https://www.whatsizemac.com"
             let WEBSITE_REPO = URL.iddHomeDirectory.appendingPathComponent("Development/git.id-design.com/website")
-            
-            Log4swift[Self.self].info("Manually upload/download ...")
-            Log4swift[Self.self].info("Use these commands to upload packages into the public servers directly")
-            Log4swift[Self.self].info("    --------------------------------")
-            Log4swift[Self.self].info("scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(project.sparkle.sshUserName):\(WEBSERVER_ROOT)/\(packageFolder.lowercased()).pkg")
-            Log4swift[Self.self].info("\(WEBSITE_URL)/downloads/\(packageFolder.lowercased()).pkg")
-            
-            Log4swift[Self.self].info(" ")
-            Log4swift[Self.self].info("Manually Update the Sparkle server directly ...")
-            Log4swift[Self.self].info("These commands will update the public sparkle server, live")
-            Log4swift[Self.self].info("    --------------------------------")
-            Log4swift[Self.self].info("scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL)/\(packageFolder.lowercased()).tgz")
-            Log4swift[Self.self].info("scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL)/\(project.packageName.lowercased()).pkg")
-            Log4swift[Self.self].info("scp -r \(project.sparkle.releaseURL.path)/ \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL)/")
-            
-            Log4swift[Self.self].info(" ")
-            Log4swift[Self.self].info("Manually Update the local WebSite repo ...")
-            Log4swift[Self.self].info("Validate/Test locally than push to the remote: '\(WEBSITE_REPO.path)'")
-            Log4swift[Self.self].info("When ready sync the live server with this repo to see Sparkle and WebSite changes ...")
-            Log4swift[Self.self].info("    --------------------------------")
-            Log4swift[Self.self].info("cp -R ~/Development/git.id-design.com/whatsize7/WhatSize/release \(WEBSITE_REPO.path)/www.whatsizemac.com/software/whatsize7/")
-            Log4swift[Self.self].info("cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz \(WEBSITE_REPO.path)/www.whatsizemac.com/software/whatsize7/\(packageFolder.lowercased()).tgz")
-            Log4swift[Self.self].info("cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(WEBSITE_REPO.path)/www.whatsizemac.com/software/whatsize7/\(project.packageName.lowercased()).pkg")
+
+            packageTips.append("")
+            packageTips.append("")
+            packageTips.append("# LIVE package upload ...")
+            packageTips.append("# These commands will update the files DIRECTLY")
+            packageTips.append("# Changes will happen immediately live, not recommended")
+            packageTips.append("\(WEBSITE_URL)/downloads/\(packageFolder.lowercased()).pkg")
+            packageTips.append("--- --- --- --- ---")
+            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(project.sparkle.sshUserName):\(WEBSERVER_ROOT)/\(packageFolder.lowercased()).pkg")
+            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL)/\(packageFolder.lowercased()).tgz")
+            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL)/\(project.packageName.lowercased()).pkg")
+            packageTips.append(" # scp -r \(project.sparkle.releaseURL.path)/ \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL)/")
+            packageTips.append("")
+            packageTips.append("")
+            packageTips.append("# MANUAL, files will be pushed into the local git repo ...")
+            packageTips.append("# Validate/Test locally than push to the remote: '\(WEBSITE_REPO.path)'")
+            packageTips.append("# When ready sync the live server with this repo to see Sparkle and WebSite changes ...")
+            packageTips.append("--- --- --- --- ---")
+            packageTips.append("   cp -R ~/Development/git.id-design.com/whatsize7/WhatSize/release \(WEBSITE_REPO.path)/www.whatsizemac.com/software/whatsize7/")
+            packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz \(WEBSITE_REPO.path)/www.whatsizemac.com/software/whatsize7/\(packageFolder.lowercased()).tgz")
+            packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(WEBSITE_REPO.path)/www.whatsizemac.com/software/whatsize7/\(project.packageName.lowercased()).pkg")
+
         } else if project.packageIdentifier.hasPrefix("com.other") {
+            packageTips.append("")
         }
         
-        Log4swift[Self.self].info(" ")
-        Log4swift[Self.self].info("Install the package locally and test ...")
-        Log4swift[Self.self].info("sudo installer -verbose -pkg ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg -target /")
-        Log4swift[Self.self].info(" ")
+        packageTips.append("")
+        packageTips.append("")
+        packageTips.append("--- --- --- --- --- ---")
+        packageTips.append("Install the package locally and test ...")
+        packageTips.append("sudo installer -verbose -pkg ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg -target /")
+        packageTips.append("")
+        Log4swift[Self.self].info(packageTips.joined(separator: "\n"))
     }
 }

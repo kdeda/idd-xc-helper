@@ -10,17 +10,21 @@ import Log4swift
 import SwiftCommons
 
 extension URL {
-    /*
-     The team identifier for the Developer Team to be used with this notarytool subcommand. Usually 10 alphanumeric characters. Your Apple ID may be a member of multiple teams, you can find Team IDs for teams you belong to by going to <https://developer.apple.com/account/#/membership>. You cannot get information on Submission IDs created by another wwdr_team_id.
+    /**
+     The team identifier for the Developer Team to be used with this notarytool subcommand.
+     Usually 10 alphanumeric characters.
+     Your Apple ID may be a member of multiple teams.
+     You can find Team IDs for teams you belong to by going to <https://developer.apple.com/account/#/membership>.
+     You cannot get information on Submission IDs created by another wwdr_team_id.
      
      https://scriptingosx.com/2021/07/notarize-a-command-line-tool-with-notarytool/
      
      xcrun notarytool store-credentials --apple-id kdeda@mac.com --team-id ME637H7ZM9
-     # enter a name for this profile ie: GATEKEEPER_IDD_PROFILE
+     # enter a name for this profile ie: WhatSizeAppPassword, i'm matching this with the name i put on  https://support.apple.com/en-us/HT204397
      # enter the password, this password should match the one we got from https://support.apple.com/en-us/HT204397
-     # profile GATEKEEPER_IDD_PROFILE
-     # once the GATEKEEPER_IDD_PROFILE is created we can just use it
-     /usr/bin/xcrun notarytool submit /Users/kdeda/Development/build/Package/WhatSize.pkg --keychain-profile GATEKEEPER_IDD_PROFILE --wait
+     # profile WhatSizeAppPassword
+     # once the WhatSizeAppPassword is created we can just use it
+     /usr/bin/xcrun notarytool submit /Users/kdeda/Development/build/Package/WhatSize.pkg --keychain-profile WhatSizeAppPassword --wait
      */
     public func notarize(keychainProfile: String) {
         let arguments = [
