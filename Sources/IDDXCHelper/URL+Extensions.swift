@@ -3,6 +3,7 @@
 //  xchelper
 //
 //  Created by Klajd Deda on 10/19/22.
+//  Copyright (C) 1997-2023 id-design, inc. All rights reserved.
 //
 
 import Foundation

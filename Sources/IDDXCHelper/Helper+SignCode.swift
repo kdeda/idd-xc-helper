@@ -3,6 +3,7 @@
 //  
 //
 //  Created by Klajd Deda on 10/24/22.
+//  Copyright (C) 1997-2023 id-design, inc. All rights reserved.
 //
 
 import Foundation

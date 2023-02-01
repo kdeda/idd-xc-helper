@@ -3,6 +3,7 @@
 //  xchelper
 //
 //  Created by Klajd Deda on 10/25/22.
+//  Copyright (C) 1997-2023 id-design, inc. All rights reserved.
 //
 
 import Foundation
@@ -32,7 +33,7 @@ public struct Tool {
                 return nil
             } else {
                 Log4swift.getLogger("main").info("Starting as daemon ...")
-                return URL.iddHomeDirectory.appendingPathComponent("Library/Logs/\(toolName).log").path
+                return URL.home.appendingPathComponent("Library/Logs/\(toolName).log").path
             }
         }()
 

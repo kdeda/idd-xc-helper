@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		F35DD5642908377D00314036 /* WhatSize7 in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB47A57D2904431E00324F69 /* WhatSize7 */; };
+		FBB550DE298AB4F70092C582 /* IDDXCHelper in Frameworks */ = {isa = PBXBuildFile; productRef = FBB550DD298AB4F70092C582 /* IDDXCHelper */; };
 		FBE720FF29043858009EA1BD /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE720FE29043858009EA1BD /* main.swift */; };
-		FBEBAAEC29043D6200DB92FF /* XCSwiftHelper in Frameworks */ = {isa = PBXBuildFile; productRef = FBEBAAEB29043D6200DB92FF /* XCSwiftHelper */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,10 +27,11 @@
 
 /* Begin PBXFileReference section */
 		FB47A57D2904431E00324F69 /* WhatSize7 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WhatSize7; sourceTree = "<group>"; };
+		FBB550DC298AB4EE0092C582 /* idd-xc-helper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "idd-xc-helper"; path = ../..; sourceTree = "<group>"; };
+		FBB550DF298AB5420092C582 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		FBB91BA22906D78200F720BF /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FBE720FB29043858009EA1BD /* idd-xchelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "idd-xchelper"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBE720FE29043858009EA1BD /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		FBEBAAEA29043CC200DB92FF /* XCSwiftHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = XCSwiftHelper; path = ../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,7 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBEBAAEC29043D6200DB92FF /* XCSwiftHelper in Frameworks */,
+				FBB550DE298AB4F70092C582 /* IDDXCHelper in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -48,7 +49,7 @@
 		FBE720F229043858009EA1BD = {
 			isa = PBXGroup;
 			children = (
-				FBEBAAEA29043CC200DB92FF /* XCSwiftHelper */,
+				FBB550DC298AB4EE0092C582 /* idd-xc-helper */,
 				FBE720FD29043858009EA1BD /* xchelper */,
 				FBE720FC29043858009EA1BD /* Products */,
 				FBEBAAE529043C9F00DB92FF /* Frameworks */,
@@ -67,6 +68,7 @@
 			isa = PBXGroup;
 			children = (
 				FBE720FE29043858009EA1BD /* main.swift */,
+				FBB550DF298AB5420092C582 /* README.md */,
 				FBB91BA22906D78200F720BF /* Info.plist */,
 				FB47A57D2904431E00324F69 /* WhatSize7 */,
 			);
@@ -97,7 +99,7 @@
 			);
 			name = "idd-xchelper";
 			packageProductDependencies = (
-				FBEBAAEB29043D6200DB92FF /* XCSwiftHelper */,
+				FBB550DD298AB4F70092C582 /* IDDXCHelper */,
 			);
 			productName = xchelper;
 			productReference = FBE720FB29043858009EA1BD /* idd-xchelper */;
@@ -313,9 +315,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		FBEBAAEB29043D6200DB92FF /* XCSwiftHelper */ = {
+		FBB550DD298AB4F70092C582 /* IDDXCHelper */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = XCSwiftHelper;
+			productName = IDDXCHelper;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

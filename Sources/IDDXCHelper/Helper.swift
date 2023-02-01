@@ -3,6 +3,7 @@
 //  xchelper
 //
 //  Created by Klajd Deda on 9/11/19.
+//  Copyright (C) 1997-2023 id-design, inc. All rights reserved.
 //
 
 import Foundation
@@ -118,7 +119,7 @@ public struct Helper {
     private func fixPermissions() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
-        let script = URL.iddHomeDirectory.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/fixPackagePermissions.tcsh")
+        let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/fixPackagePermissions.tcsh")
         let output = Process.fetchString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
         
         if output.range(of: "completed") == nil {
@@ -225,7 +226,7 @@ public struct Helper {
     public func createPackage() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
-        let script = URL.iddHomeDirectory.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/chownExistingPackage.tcsh")
+        let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/chownExistingPackage.tcsh")
         let output = Process.fetchString(taskURL: Dependency.SUDO, arguments: [script.path])
         
         if output.range(of: "completed") == nil {
@@ -325,7 +326,7 @@ public struct Helper {
     public func compressPackage() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
-        let script = URL.iddHomeDirectory.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/compressPackage.tcsh")
+        let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/compressPackage.tcsh")
         let output = Process.fetchString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
         if output.range(of: "completed") == nil {
             Log4swift[Self.self].info(output)
@@ -333,7 +334,7 @@ public struct Helper {
         }
         
         let packageFolder = "\(project.packageName)_\(project.versionInfo.bundleShortVersionString)"
-        let desktopBaseURL = Dependency.DESKTOP_PACKAGES.appendingPathComponent(packageFolder)
+        let desktopBaseURL = Dependency.PACKAGES_ARCHIVE_ROOT.appendingPathComponent(packageFolder)
         
         FileManager.default.createDirectoryIfMissing(at: desktopBaseURL)
         do {
@@ -413,7 +414,7 @@ public struct Helper {
         if project.packageIdentifier.hasPrefix("com.id-design") {
             let WEBSERVER_ROOT = "/var/www/www.whatsizemac.com/downloads"
             let WEBSITE_URL = "https://www.whatsizemac.com"
-            let WEBSITE_REPO = URL.iddHomeDirectory.appendingPathComponent("Development/git.id-design.com/website")
+            let WEBSITE_REPO = URL.home.appendingPathComponent("Development/git.id-design.com/website")
 
             packageTips.append("")
             packageTips.append("")

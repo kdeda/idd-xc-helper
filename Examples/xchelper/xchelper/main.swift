@@ -7,7 +7,7 @@
 
 import Foundation
 import Log4swift
-import XCSwiftHelper
+import IDDXCHelper
 
 fileprivate let tool = Tool(knownConfigs: ["WhatSize7"])
 
