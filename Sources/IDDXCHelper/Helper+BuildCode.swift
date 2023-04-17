@@ -8,7 +8,7 @@
 
 import Foundation
 import Log4swift
-import SwiftCommons
+import IDDSwift
 
 extension Helper {
     /**
@@ -40,7 +40,7 @@ extension Helper {
         //
         if output.range(of: "INSTALL SUCCEEDED") == nil {
             Log4swift[Self.self].info("failed build ...")
-            Log4swift[Self.self].info(output)
+            Log4swift[Self.self].info("\(output)")
             exit(0)
         }
         Log4swift[Self.self].info("completed build")
@@ -52,7 +52,7 @@ extension Helper {
      But under it there might be other folders such as '../Intermediates.noindex' or '../Package'
      */
     public func buildCode() {
-        Log4swift[Self.self].info("package: '\(project.configName)'")
+        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
 
         if FileManager.default.removeItemIfExist(at: project.buildProductsURL) {
             Log4swift[Self.self].info("removed: '\(project.buildProductsURL.path)'")

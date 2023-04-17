@@ -8,7 +8,7 @@
 
 import Foundation
 import Log4swift
-import SwiftCommons
+import IDDSwift
 
 /**
  Implementations for each HelperAction
@@ -70,7 +70,7 @@ public struct Helper {
         let packageNameResources = project.configURL.appendingPathComponent("Resources")
         let output = Process.fetchString(taskURL: Dependency.XATTR, arguments: ["-cr", packageNameResources.path])
         
-        Log4swift[Self.self].info(output)
+        Log4swift[Self.self].info("\(output)")
     }
     
     private func signPackageValidate() {
@@ -123,7 +123,7 @@ public struct Helper {
         let output = Process.fetchString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
         
         if output.range(of: "completed") == nil {
-            Log4swift[Self.self].info(output)
+            Log4swift[Self.self].info("\(output)")
             exit(0)
         }
     }
@@ -168,7 +168,7 @@ public struct Helper {
         guard output.range(of: ": Wrote package to") != .none
         else {
             Log4swift[Self.self].info("failed to create: \(project.pathToPKGUnsigned.path)")
-            Log4swift[Self.self].info("output: \(output)")
+            Log4swift[Self.self].info("\(output)")
             Log4swift[Self.self].info("")
             Log4swift[Self.self].info("")
             exit(0)
@@ -203,7 +203,12 @@ public struct Helper {
     public init(configURL: URL) {
         self.project = Project(configURL: configURL)!
     }
-    
+
+    public func actionDivider(method: String = #function) -> String {
+        let logMessage = "<IDDXCHelper.Helper \(method)>   package: '\(project.configName)'"
+        return "\n" + Array(repeating: "-", count: 42 + logMessage.count).joined(separator: "")
+    }
+
     public func handleAction(_ action: HelperAction) -> Helper {
         switch action {
         case .updateVersions: updateVersions()
@@ -224,13 +229,21 @@ public struct Helper {
     // will blast and recreate the Package folder at project.packageRootURL
     //
     public func createPackage() {
-        Log4swift[Self.self].info("package: '\(project.configName)'")
-        
+        let security = URL(fileURLWithPath: "/private/etc/sudoers.d/kdeda")
+
+        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+
+        if !security.fileExist {
+            Log4swift[Self.self].info("Please create: '\(security.path)'")
+            Log4swift[Self.self].info("   Follow instrctions from '../common/scripts/ ReadMe.txt'")
+            Log4swift[Self.self].info("   Upgrading or installing a macOS major update tends to blw these away")
+            exit(0)
+        }
         let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/chownExistingPackage.tcsh")
         let output = Process.fetchString(taskURL: Dependency.SUDO, arguments: [script.path])
         
         if output.range(of: "completed") == nil {
-            Log4swift[Self.self].info(output)
+            Log4swift[Self.self].info("\(output)")
             exit(0)
         }
 
@@ -251,8 +264,8 @@ public struct Helper {
     }
     
     public func notarizePackage() {
-        Log4swift[Self.self].info("package: '\(project.configName)'")
-        
+        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+
         let pkgFile = project.pathToPKG
         pkgFile.notarize(keychainProfile: project.keyChain.keychainProfile)
         if !pkgFile.xcrunStaplerStapleAndValidate {
@@ -267,8 +280,8 @@ public struct Helper {
      */
     //
     public func notarizeApp() {
-        Log4swift[Self.self].info("package: '\(project.configName)'")
-        
+        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+
         guard let productFile = project.productFiles.filter(\.requiresSignature).first
         else {
             exit(0)
@@ -301,8 +314,8 @@ public struct Helper {
      */
     // TODO: Fix me ...
     public func notarizeDMG() {
-        Log4swift[Self.self].info("package: '\(project.configName)'")
-        
+        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+
 //        let apps = project.productFilesToSign.map(Config.BUILD_SOURCE.appendingPathComponent)
 //        guard let appPath = apps.first
 //        else {
@@ -324,12 +337,12 @@ public struct Helper {
     }
 
     public func compressPackage() {
-        Log4swift[Self.self].info("package: '\(project.configName)'")
-        
+        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+
         let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/compressPackage.tcsh")
         let output = Process.fetchString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
         if output.range(of: "completed") == nil {
-            Log4swift[Self.self].info(output)
+            Log4swift[Self.self].info("\(output)")
             exit(0)
         }
         
@@ -360,7 +373,7 @@ public struct Helper {
     // shall be called after compressPackage
     //
     public func updateSparkle() {
-        Log4swift[Self.self].info("package: '\(project.configName)'")
+        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
         Log4swift[Self.self].info("notes_xml: '\(project.notes_xml)'")
         do {
             let fileURL = project.sparkle.releaseURL.appendingPathComponent("notes.xml")
@@ -407,7 +420,8 @@ public struct Helper {
     }
     
     public func packageTips() {
-        Log4swift[Self.self].info("package: '\(project.configName)'")
+        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+
         let packageFolder = "\(project.packageName)_\(project.versionInfo.bundleShortVersionString)"
         var packageTips = [String]()
 
@@ -447,6 +461,6 @@ public struct Helper {
         packageTips.append("Install the package locally and test ...")
         packageTips.append("sudo installer -verbose -pkg ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg -target /")
         packageTips.append("")
-        Log4swift[Self.self].info(packageTips.joined(separator: "\n"))
+        Log4swift[Self.self].info("\(packageTips.joined(separator: "\n"))")
     }
 }

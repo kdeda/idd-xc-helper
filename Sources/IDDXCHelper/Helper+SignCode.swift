@@ -8,7 +8,7 @@
 
 import Foundation
 import Log4swift
-import SwiftCommons
+import IDDSwift
 
 extension Helper {
     private func removeSignature(file fileURL: URL) {
@@ -201,7 +201,7 @@ extension Helper {
     // http://lessons.livecode.com/a/1088036-signing-and-notarizing-macos-apps-for-gatekeeper
     //
     public func signCode() {
-        Log4swift[Self.self].info("package: '\(project.configName)'")
+        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
 
         project.productFiles.filter(\.requiresSignature).forEach { productFile in
             if productFile.sourceURL.pathExtension == "app" {

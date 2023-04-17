@@ -8,13 +8,13 @@
 
 import Foundation
 import Log4swift
-import SwiftCommons
+import IDDSwift
 
 // MARK: - Project (Sparkle) -
 extension Project {
     var sparkleEnclosure: String {
         let output = Process.fetchString(taskURL: Dependency.SPARKLE_SIGN, arguments: [pathToTGZ.path])
-        Log4swift[Self.self].info(output)
+        Log4swift[Self.self].info("\(output)")
         
         // output will contain a string in the form
         // sparkle:edSignature="wWhIamodvcYgxhTGqyLJ56WCr4Hl9VXSJWlkOzBlW8tNCtpkIOoTJlwui08EE/9F2oEltal6pNZZP8NXbHtPDA==" length="10101732"

@@ -5,17 +5,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kdeda/idd-log4-swift.git",
       "state" : {
-        "revision" : "de55f45d40e0db14b4a8381fbb20ed0e1adf2a87",
-        "version" : "1.2.3"
+        "revision" : "0db2a4cf81631bdff5dbdee445562686e6dab750",
+        "version" : "2.0.2"
       }
     },
     {
-      "identity" : "idd-swift-commons",
+      "identity" : "idd-swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kdeda/idd-swift-commons.git",
+      "location" : "https://github.com/kdeda/idd-swift.git",
       "state" : {
-        "revision" : "91d5518eaf5769c5935c61a8ad7ec439e9eb85a4",
-        "version" : "1.4.1"
+        "revision" : "211c6639922c63395e45f209374a20e4baf02ae3",
+        "version" : "2.0.1"
       }
     },
     {
@@ -23,8 +23,26 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kdeda/idd-zstd-swift.git",
       "state" : {
-        "revision" : "3e121dd7510af722777fe87f10d1463903a1b988",
-        "version" : "1.2.1"
+        "revision" : "2c3da92c9953fa17a6d578691453c262f694c378",
+        "version" : "2.0.1"
+      }
+    },
+    {
+      "identity" : "swift-crypto",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-crypto.git",
+      "state" : {
+        "revision" : "6d9c36b4beda0dae88feab6dc36206434bae713c",
+        "version" : "2.4.1"
+      }
+    },
+    {
+      "identity" : "swift-log",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-log.git",
+      "state" : {
+        "revision" : "32e8d724467f8fe623624570367e3d50c5638e46",
+        "version" : "1.5.2"
       }
     }
   ],

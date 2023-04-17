@@ -27,17 +27,7 @@ public struct Tool {
     }
 
     private func validate(projectURL: inout URL) {
-        let IDDLogLogFileName: String? = {
-            if UserDefaults.standard.bool(forKey: "standardLog") {
-                Log4swift.getLogger("main").info("Starting as normal process: '\(toolName)' (not a daemon) ...")
-                return nil
-            } else {
-                Log4swift.getLogger("main").info("Starting as daemon ...")
-                return URL.home.appendingPathComponent("Library/Logs/\(toolName).log").path
-            }
-        }()
-
-        Log4swiftConfig.configureLogs(defaultLogFile: IDDLogLogFileName, lock: "IDDLogLock")
+        Log4swift.configure(appName: toolName)
 
         /**
          We need to provide the path to the Project.json for this work

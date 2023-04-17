@@ -8,7 +8,7 @@
 
 import Foundation
 import Log4swift
-import SwiftCommons
+import IDDSwift
 
 extension Helper {
     // update the info.plist, save it if there are changes
@@ -40,6 +40,8 @@ extension Helper {
     }
 
     public func updateVersions() {
+        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+
         project.infoPlistFiles.forEach(updateInfo(at:))
     }
 }
