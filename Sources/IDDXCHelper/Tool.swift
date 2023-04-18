@@ -78,6 +78,7 @@ public struct Tool {
         guard !output.isEmpty,
               FileManager.default.hasFullDiskAccess
         else {
+            FileManager.default.hasFullDiskAccessTips()
             exit(0)
         }
     }

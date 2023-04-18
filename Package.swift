@@ -14,7 +14,7 @@ let package = Package(
             targets: ["IDDXCHelper"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/kdeda/idd-swift.git", from: "2.0.1")
+        .package(url: "https://github.com/kdeda/idd-swift.git", from: "2.0.2")
     ],
     targets: [
         .target(
