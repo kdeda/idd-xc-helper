@@ -74,9 +74,7 @@ public struct Tool {
         Log4swift["main"].info("-config '\(config)' projectURL: '\(projectURL.path)'")
 
         /// make sure we have full disk access
-        let output = Process.fetchString(taskURL: URL(fileURLWithPath: "/bin/date"), arguments: [])
-        guard !output.isEmpty,
-              FileManager.default.hasFullDiskAccess
+        guard FileManager.default.hasFullDiskAccess
         else {
             FileManager.default.hasFullDiskAccessTips()
             exit(0)

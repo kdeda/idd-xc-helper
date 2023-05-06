@@ -209,10 +209,10 @@ public struct Helper {
         return "\n" + Array(repeating: "-", count: 42 + logMessage.count).joined(separator: "")
     }
 
-    public func handleAction(_ action: HelperAction) -> Helper {
+    public func handleAction(_ action: HelperAction) async -> Helper {
         switch action {
         case .updateVersions: updateVersions()
-        case .buildCode: buildCode()
+        case .buildCode: await buildCode()
         case .signCode: signCode()
         case .updateSparkle: updateSparkle()
         case .createPackage: createPackage()
