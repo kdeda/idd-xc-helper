@@ -15,7 +15,7 @@ extension Helper {
      Build a particular Worksapce, for complex project you might have to build a few.
      For now all the workspaces must output to the same project.buildProductsURL folder
      */
-    private func build(workspace: Workspace) {
+    private func build(workspace: Workspace) async {
         Log4swift[Self.self].info("building ...")
 
         // More arguments can be passed here as "KEY=Value" type thing
@@ -23,24 +23,66 @@ extension Helper {
         // somehow escaping the DSTROOT results in odd ball issues
         // so we will assume there are no spaces in them ...
         //
-        let output = Process.fetchString(
-            taskURL: Dependency.XCODE_BUILD,
-            arguments: [
-                "-workspace", workspace.workspaceURL.path,
-                "-scheme", workspace.scheme,
-                "-configuration", "Release",
-                "DSTROOT=\(project.buildProductsURL.path)",
-                "DWARF_DSYM_FOLDER_PATH=\(project.buildProductsURL.path)",
-                "INSTALL_PATH=.",
-                "install"
-            ]
-        )
+        let process = Process(Dependency.XCODE_BUILD, [
+            "-workspace", workspace.workspaceURL.path,
+            "-scheme", workspace.scheme,
+            "-configuration", "Release",
+            "DSTROOT=\(project.buildProductsURL.path)",
+            "DWARF_DSYM_FOLDER_PATH=\(project.buildProductsURL.path)",
+            "INSTALL_PATH=.",
+            "install"
+        ])
+
+        var processOutput = ""
+        let fileHandle: FileHandle? = {
+            let processName = Bundle.main.executableURL?.lastPathComponent ?? "unknown"
+            let logFile = URL.home.appendingPathComponent("Library/Logs/\(processName)_build.log")
+            if !logFile.fileExist {
+                try? "".write(to: logFile, atomically: true, encoding: .utf8)
+            }
+            Log4swift[Self.self].info("to see log details\n tail -f '\(logFile.path)'")
+
+            let rv = try? FileHandle(forWritingTo: logFile)
+            _ = try? rv?.seekToEnd()
+            rv?.write(
+                """
+                \n
+                --------------------------------------------------
+                building workspace: \(workspace.scheme)
+                --------------------------------------------------
+                \n
+                """.data(using: .utf8) ?? Data())
+            return rv
+        }()
+
+        for await output in process.asyncOutput() {
+            switch output {
+            case let .error(error):
+                ()
+                // Log4swift[Self.self].info("error: '\(error)'")
+            case let .terminated(reason):
+                ()
+                // Log4swift[Self.self].info("terminated: '\(reason)'")
+            case let .stdout(data):
+                fileHandle?.write(data)
+
+                let string = String(data: data, encoding: .utf8) ?? ""
+                // Log4swift[Self.self].info("stdout: '\(string)'")
+                processOutput += string
+            case let .stderr(data):
+                fileHandle?.write(data)
+
+                let string = String(data: data, encoding: .utf8) ?? ""
+                //Log4swift[Self.self].info("stderr: '\(string)'")
+                processOutput += string
+            }
+        }
 
         // the 'install' parameter on the arguments will force this output if all goes well
         //
-        if output.range(of: "INSTALL SUCCEEDED") == nil {
+        if processOutput.range(of: "INSTALL SUCCEEDED") == nil {
             Log4swift[Self.self].info("failed build ...")
-            Log4swift[Self.self].info("\(output)")
+            Log4swift[Self.self].info("\(processOutput)")
             exit(0)
         }
         Log4swift[Self.self].info("completed build")
@@ -51,7 +93,7 @@ extension Helper {
      Keep in mind the buildProductsURL points to where xcode will put the products. ie: '/Users/kdeda/Development/build/Release'
      But under it there might be other folders such as '../Intermediates.noindex' or '../Package'
      */
-    public func buildCode() {
+    public func buildCode() async {
         Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
 
         if FileManager.default.removeItemIfExist(at: project.buildProductsURL) {
@@ -61,7 +103,7 @@ extension Helper {
             Log4swift[Self.self].info("created: '\(project.buildProductsURL.path)'")
         }
 
-        project.workspaces.forEach(build(workspace:))
+        await project.workspaces.asyncForEach(build(workspace:))
     }
 }
 
