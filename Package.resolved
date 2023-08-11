@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kdeda/idd-swift.git",
       "state" : {
-        "revision" : "3566255525c49c9fb5d082077bde258fbc658e82",
-        "version" : "2.0.2"
+        "revision" : "252db4019d802a24f5e8a750b084296e37285efc",
+        "version" : "2.0.9"
       }
     },
     {

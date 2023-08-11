@@ -13,7 +13,7 @@ import IDDSwift
 // MARK: - Project (Sparkle) -
 extension Project {
     var sparkleEnclosure: String {
-        let output = Process.fetchString(taskURL: Dependency.SPARKLE_SIGN, arguments: [pathToTGZ.path])
+        let output = Process.stdString(taskURL: Dependency.SPARKLE_SIGN, arguments: [pathToTGZ.path])
         Log4swift[Self.self].info("\(output)")
         
         // output will contain a string in the form

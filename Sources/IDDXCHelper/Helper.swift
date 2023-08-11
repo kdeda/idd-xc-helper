@@ -68,13 +68,11 @@ public struct Helper {
         // remove xattr
         //
         let packageNameResources = project.configURL.appendingPathComponent("Resources")
-        let output = Process.fetchString(taskURL: Dependency.XATTR, arguments: ["-cr", packageNameResources.path])
-        
-        Log4swift[Self.self].info("\(output)")
+        _ = Process.stdString(taskURL: Dependency.XATTR, arguments: ["-cr", packageNameResources.path])
     }
     
     private func signPackageValidate() {
-        let output = Process.fetchString(
+        let output = Process.stdString(
             taskURL: Dependency.PACKAGE_UTIL,
             arguments: ["--check-signature", project.pathToPKG.path]
         )
@@ -93,7 +91,7 @@ public struct Helper {
     private func signPackage() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
-        let output = Process.fetchString(
+        let output = Process.stdString(
             taskURL: Dependency.PRODUCT_SIGN,
             arguments: [
                 "--sign",
@@ -120,7 +118,7 @@ public struct Helper {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
         let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/fixPackagePermissions.tcsh")
-        let output = Process.fetchString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
+        let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
         
         if output.range(of: "completed") == nil {
             Log4swift[Self.self].info("\(output)")
@@ -148,7 +146,7 @@ public struct Helper {
         // and replace the relocatable flag
         // plutil -replace BundleIsRelocatable -bool NO component-list.plist
         //
-        var output = Process.fetchString(
+        var output = Process.stdString(
             taskURL: Dependency.PACKAGE_BUILD,
             arguments: [
                 "--identifier",
@@ -176,7 +174,7 @@ public struct Helper {
 
         // Adorn the package, ie: WhatSizeAdorned.pkg
         //
-        output = Process.fetchString(
+        output = Process.stdString(
             taskURL: Dependency.PRODUCT_BUILD,
             arguments: [
                 "--distribution",
@@ -240,7 +238,7 @@ public struct Helper {
             exit(0)
         }
         let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/chownExistingPackage.tcsh")
-        let output = Process.fetchString(taskURL: Dependency.SUDO, arguments: [script.path])
+        let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path])
         
         if output.range(of: "completed") == nil {
             Log4swift[Self.self].info("\(output)")
@@ -289,7 +287,7 @@ public struct Helper {
         
         let appName = productFile.sourceURL.deletingPathExtension().lastPathComponent
         let zipFile = productFile.sourceURL.deletingLastPathComponent().appendingPathComponent("\(appName.lowercased()).zip")
-        _ = Process.fetchString(
+        _ = Process.stdString(
             taskURL: Dependency.DITTO,
             arguments: ["-c", "-k", "--sequesterRsrc", "--keepParent", productFile.sourceURL.path, zipFile.path]
         )
@@ -303,7 +301,7 @@ public struct Helper {
             exit(0)
         }
         // than create a new zip
-        _ = Process.fetchString(
+        _ = Process.stdString(
             taskURL: Dependency.DITTO,
             arguments: ["-c", "-k", "--sequesterRsrc", "--keepParent", productFile.sourceURL.path, zipFile.path]
         )
@@ -340,7 +338,7 @@ public struct Helper {
         Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
 
         let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/compressPackage.tcsh")
-        let output = Process.fetchString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
+        let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
         if output.range(of: "completed") == nil {
             Log4swift[Self.self].info("\(output)")
             exit(0)

@@ -52,16 +52,31 @@ extension URL {
          """
          */
         
-        let processOutput = Process.fetchString(taskURL: Dependency.XCRUN, arguments: arguments)
+        let processOutput = Process.stdString(taskURL: Dependency.XCRUN, arguments: arguments)
         let tokens = processOutput.components(separatedBy: "\n")
-        
+
+        func uuid(_ tokens: [String]) -> String? {
+            return tokens.filter { $0.contains("id:") }.first?.replacingOccurrences(of: "id:", with: "").trimmingCharacters(in: .whitespaces)
+        }
+
         guard let index = tokens.firstIndex(where: { $0.contains("Processing complete") }),
               index + 2 < tokens.count,
               tokens[index + 2].contains("status: Accepted")
-        else { exit(0) }
-        
-        let rv = tokens[index + 1].replacingOccurrences(of: "id:", with: "")
-        let uuid = rv.trimmingCharacters(in: CharacterSet.whitespaces)
+        else {
+            // find the log id from the response, than pass it along to the task to see the log that apple is sending
+            if let uuid = uuid(tokens) {
+                let arguments = [
+                    "notarytool",
+                    "log", uuid,
+                    "--keychain-profile", keychainProfile
+                ]
+                let processOutput = Process.stdString(taskURL: Dependency.XCRUN, arguments: arguments)
+                Log4swift[Self.self].info("log: '\(processOutput)'")
+            }
+
+            exit(0)
+        }
+        let uuid = uuid(tokens) ?? "UNKNOWN"
         Log4swift[Self.self].info("received uuid: \(uuid) for: '\(self.path)'")
     }
     
@@ -71,7 +86,7 @@ extension URL {
      /usr/bin/stapler staple -v /Users/kdeda/Desktop/Packages/WhatSize_7.3.2/WhatSize.pkg
      */
     var xcrunStaplerStaple: Bool {
-        let output = Process.fetchString(
+        let output = Process.stdString(
             taskURL: Dependency.XCRUN,
             arguments: ["stapler", "staple", "-v", self.path]
         )
@@ -89,7 +104,7 @@ extension URL {
      /usr/bin/stapler validate -v /Users/kdeda/Desktop/Packages/WhatSize_7.3.2/WhatSize.pkg
      */
     var xcrunStaplerValidate: Bool {
-        let output = Process.fetchString(
+        let output = Process.stdString(
             taskURL: Dependency.XCRUN,
             arguments: ["stapler", "validate", "-v", self.path]
         )
