@@ -96,7 +96,11 @@ public struct Project: Codable {
     var pathToTGZ: URL {
         return packageRootURL.appendingPathComponent(packageName).appendingPathExtension("tgz")
     }
-    
+
+    var pathToDWARFTGZ: URL {
+        return packageRootURL.appendingPathComponent(packageName.appending("_DWARF")).appendingPathExtension("tgz")
+    }
+
     // created first, raw
     var pathToPKGUnsigned: URL {
         return packageRootURL.appendingPathComponent("\(packageName)Unsigned").appendingPathExtension("pkg")

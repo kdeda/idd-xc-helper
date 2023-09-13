@@ -34,12 +34,11 @@ extension Helper {
         ])
 
         var processOutput = ""
+        let processName = Bundle.main.executableURL?.lastPathComponent ?? "unknown"
+        let logFile = URL.home.appendingPathComponent("Library/Logs/\(processName)_build.log")
         let fileHandle: FileHandle? = {
-            let processName = Bundle.main.executableURL?.lastPathComponent ?? "unknown"
-            let logFile = URL.home.appendingPathComponent("Library/Logs/\(processName)_build.log")
-            if !logFile.fileExist {
-                try? "".write(to: logFile, atomically: true, encoding: .utf8)
-            }
+            // the file shall be reset to zero ...
+            try? "".write(to: logFile, atomically: true, encoding: .utf8)
             Log4swift[Self.self].info("to see log details\n tail -f '\(logFile.path)'")
 
             let rv = try? FileHandle(forWritingTo: logFile)
@@ -82,7 +81,7 @@ extension Helper {
         //
         if processOutput.range(of: "INSTALL SUCCEEDED") == nil {
             Log4swift[Self.self].info("failed build ...")
-            Log4swift[Self.self].info("\(processOutput)")
+            Log4swift[Self.self].info("to see log details\n tail -100 '\(logFile.path)'")
             exit(0)
         }
         Log4swift[Self.self].info("completed build")

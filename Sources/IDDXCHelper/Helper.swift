@@ -79,10 +79,10 @@ public struct Helper {
         
         guard output.range(of: "Signed with a trusted timestamp") != .none
         else {
-            Log4swift[Self.self].info("failed to sign: \(project.pathToPKG.path)")
-            Log4swift[Self.self].info("output: \(output)")
-            Log4swift[Self.self].info("")
-            Log4swift[Self.self].info("")
+            Log4swift[Self.self].error("failed to sign: \(project.pathToPKG.path)")
+            Log4swift[Self.self].error("output: \(output)")
+            Log4swift[Self.self].error("")
+            Log4swift[Self.self].error("")
             exit(0)
         }
         Log4swift[Self.self].info("   validated signature: \(project.pathToPKG.path)")
@@ -102,10 +102,10 @@ public struct Helper {
         
         guard output.range(of: ": Wrote signed product archive") != .none
         else {
-            Log4swift[Self.self].info("failed to sign: \(project.pathToPKGUnsigned.path)")
-            Log4swift[Self.self].info("output: \(output)")
-            Log4swift[Self.self].info("")
-            Log4swift[Self.self].info("")
+            Log4swift[Self.self].error("failed to sign: \(project.pathToPKGUnsigned.path)")
+            Log4swift[Self.self].error("output: \(output)")
+            Log4swift[Self.self].error("")
+            Log4swift[Self.self].error("")
             exit(0)
         }
         Log4swift[Self.self].info("    created signed package: \(project.pathToPKG.path)")
@@ -121,7 +121,9 @@ public struct Helper {
         let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
         
         if output.range(of: "completed") == nil {
-            Log4swift[Self.self].info("\(output)")
+            Log4swift[Self.self].error("\(output)")
+            Log4swift[Self.self].error("")
+            Log4swift[Self.self].error("")
             exit(0)
         }
     }
@@ -165,10 +167,10 @@ public struct Helper {
             ])
         guard output.range(of: ": Wrote package to") != .none
         else {
-            Log4swift[Self.self].info("failed to create: \(project.pathToPKGUnsigned.path)")
-            Log4swift[Self.self].info("\(output)")
-            Log4swift[Self.self].info("")
-            Log4swift[Self.self].info("")
+            Log4swift[Self.self].error("failed to create: \(project.pathToPKGUnsigned.path)")
+            Log4swift[Self.self].error("\(output)")
+            Log4swift[Self.self].error("")
+            Log4swift[Self.self].error("")
             exit(0)
         }
 
@@ -187,10 +189,10 @@ public struct Helper {
             ])
         guard output.range(of: ": Wrote product to") != .none
         else {
-            Log4swift[Self.self].info("failed to create: \(project.pathToPKGAdorned.path)")
-            Log4swift[Self.self].info("output: \(output)")
-            Log4swift[Self.self].info("")
-            Log4swift[Self.self].info("")
+            Log4swift[Self.self].error("failed to create: \(project.pathToPKGAdorned.path)")
+            Log4swift[Self.self].error("output: \(output)")
+            Log4swift[Self.self].error("")
+            Log4swift[Self.self].error("")
             exit(0)
         }
     }
@@ -212,36 +214,41 @@ public struct Helper {
         case .updateVersions: updateVersions()
         case .buildCode: await buildCode()
         case .signCode: signCode()
-        case .updateSparkle: updateSparkle()
         case .createPackage: createPackage()
         case .notarizePackage: notarizePackage()
+        case .updateSparkle: updateSparkle()
+        case .packageTips: packageTips()
+
         case .notarizeApp: notarizeApp()
         case .notarizeDMG: notarizeDMG()
-        case .compressPackage: compressPackage()
-        case .packageTips: packageTips()
         }
         return self
     }
 
-    // should run as root
-    // will blast and recreate the Package folder at project.packageRootURL
-    //
+    /**
+     We we be creating the .pkg file from the binaries xreated earlier
+     For this to work we depend on scripts that have been set to run as root automatically.
+     */
     public func createPackage() {
         let security = URL(fileURLWithPath: "/private/etc/sudoers.d/kdeda")
 
         Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
 
         if !security.fileExist {
-            Log4swift[Self.self].info("Please create: '\(security.path)'")
-            Log4swift[Self.self].info("   Follow instrctions from '../common/scripts/ ReadMe.txt'")
-            Log4swift[Self.self].info("   Upgrading or installing a macOS major update tends to blw these away")
+            Log4swift[Self.self].error("Please create: '\(security.path)'")
+            Log4swift[Self.self].error("   Follow instrctions from '../common/scripts/ ReadMe.txt'")
+            Log4swift[Self.self].error("   Upgrading or installing a macOS major update tends to blow these away")
+            Log4swift[Self.self].error("")
+            Log4swift[Self.self].error("")
             exit(0)
         }
         let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/chownExistingPackage.tcsh")
         let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path])
         
         if output.range(of: "completed") == nil {
-            Log4swift[Self.self].info("\(output)")
+            Log4swift[Self.self].error("\(output)")
+            Log4swift[Self.self].error("")
+            Log4swift[Self.self].error("")
             exit(0)
         }
 
@@ -258,6 +265,7 @@ public struct Helper {
         signPackage()
         signPackageValidate()
         
+        createDWARFPayload()
         compressPackage()
     }
     
@@ -334,13 +342,19 @@ public struct Helper {
         }
     }
 
-    public func compressPackage() {
+    /**
+     Since .pkgs are already compressed making a tar gz of them will not really compress anything.
+     September 2023
+     */
+    private func compressPackage() {
         Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
 
         let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/compressPackage.tcsh")
         let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
         if output.range(of: "completed") == nil {
-            Log4swift[Self.self].info("\(output)")
+            Log4swift[Self.self].error("\(output)")
+            Log4swift[Self.self].error("")
+            Log4swift[Self.self].error("")
             exit(0)
         }
         
@@ -349,7 +363,7 @@ public struct Helper {
         
         FileManager.default.createDirectoryIfMissing(at: desktopBaseURL)
         do {
-            let desktopURL = desktopBaseURL.appendingPathComponent(project.packageName).appendingPathExtension("pkg")
+            let desktopURL = desktopBaseURL.appendingPathComponent(project.pathToPKG.lastPathComponent)
             
             _ = FileManager.default.removeItemIfExist(at: desktopURL)
             try FileManager.default.copyItem(at: project.pathToPKG, to: desktopURL)
@@ -358,16 +372,68 @@ public struct Helper {
             Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
         }
         do {
-            let desktopURL = desktopBaseURL.appendingPathComponent(project.packageName).appendingPathExtension("tgz")
-            
+            let desktopURL = desktopBaseURL.appendingPathComponent(project.pathToTGZ.lastPathComponent)
+
             _ = FileManager.default.removeItemIfExist(at: desktopURL)
             try FileManager.default.copyItem(at: project.pathToTGZ, to: desktopURL)
             Log4swift[Self.self].info("updated \(desktopURL.path)")
         } catch {
             Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
         }
+        do {
+            let desktopURL = desktopBaseURL.appendingPathComponent(project.pathToDWARFTGZ.lastPathComponent)
+
+            _ = FileManager.default.removeItemIfExist(at: desktopURL)
+            try FileManager.default.copyItem(at: project.pathToDWARFTGZ, to: desktopURL)
+            Log4swift[Self.self].info("updated \(desktopURL.path)")
+        } catch {
+            Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
+        }
     }
-    
+
+    /**
+     Will make a tar/gz of the .dSYM files for this project.
+     Each .dSYM binary will be placed in a folder called ../Package/{project.packageName}DWARF
+     which will than be compressed into a {project.packageName}_DWARF.tgz
+     This allows for crash symbolication when a user crashes :-)
+     */
+    private func createDWARFPayload() {
+        let dwarfArchive = project.packageName.appending("_DWARF")
+        let dSYMRoot = project.packageRootURL.appendingPathComponent(dwarfArchive)
+        if !dSYMRoot.fileExist {
+            FileManager.default.createDirectoryIfMissing(at: dSYMRoot)
+            Log4swift[Self.self].info("created: '\(dSYMRoot.path)'")
+        }
+        project.productFiles.forEach { productFile in
+            do {
+                let destinationURL = dSYMRoot.appendingPathComponent(productFile.sourceURL.lastPathComponent).appendingPathExtension("dSYM")
+                let sourceURL = productFile.sourceURL.appendingPathExtension("dSYM")
+                if sourceURL.fileExist {
+                    try FileManager.default.copyItem(atPath: sourceURL.path, toPath: destinationURL.path)
+                    let relativePath = destinationURL.path.substring(after: project.packageRootURL.path) ?? "unknown"
+
+                    Log4swift[Self.self].info("copy: '\(sourceURL.path)' to: '..\(relativePath)'")
+                }
+            } catch {
+                Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
+            }
+        }
+
+        _ = Process(Dependency.TAR, ["zcf", dwarfArchive.appending(".tgz"), dwarfArchive])
+            .currentDir(project.packageRootURL)
+            .stdString()
+
+        let dwarfURL = project.packageRootURL.appendingPathComponent(dwarfArchive.appending(".tgz"))
+        guard dwarfURL.fileExist
+        else {
+            Log4swift[Self.self].error("failed to create: '\(dwarfURL.path)'")
+            Log4swift[Self.self].error("")
+            Log4swift[Self.self].error("")
+            exit(0)
+        }
+        Log4swift[Self.self].info("created: '\(dwarfURL.path)'")
+    }
+
     // shall be called after compressPackage
     //
     public func updateSparkle() {
@@ -421,6 +487,7 @@ public struct Helper {
         Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
 
         let packageFolder = "\(project.packageName)_\(project.versionInfo.bundleShortVersionString)"
+        let packageDwarfFolder = "\(project.packageName)_DWARF_\(project.versionInfo.bundleShortVersionString)"
         var packageTips = [String]()
 
         if project.packageIdentifier.hasPrefix("com.id-design") {
@@ -435,19 +502,22 @@ public struct Helper {
             packageTips.append("# Changes will happen immediately live, not recommended")
             packageTips.append("\(WEBSITE_URL)/downloads/\(packageFolder.lowercased()).pkg")
             packageTips.append("--- --- --- --- ---")
-            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(project.sparkle.sshUserName):\(WEBSERVER_ROOT)/\(packageFolder.lowercased()).pkg")
-            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL)/\(packageFolder.lowercased()).tgz")
-            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL)/\(project.packageName.lowercased()).pkg")
-            packageTips.append(" # scp -r \(project.sparkle.releaseURL.path)/ \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL)/")
+            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg   \(project.sparkle.sshUserName):\(WEBSERVER_ROOT)/\(packageFolder.lowercased()).pkg")
+            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz   \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL.path)/\(packageFolder.lowercased()).tgz")
+            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName)_DWARF.tgz   \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL.path)/\(packageDwarfFolder.lowercased()).tgz")
+            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg   \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL.path)/\(project.packageName.lowercased()).pkg")
+            packageTips.append(" # scp -r \(project.sparkle.releaseURL.path)/   \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL.path)/")
             packageTips.append("")
             packageTips.append("")
             packageTips.append("# MANUAL, files will be pushed into the local git repo ...")
             packageTips.append("# Validate/Test locally than push to the remote: '\(WEBSITE_REPO.path)'")
             packageTips.append("# When ready sync the live server with this repo to see Sparkle and WebSite changes ...")
             packageTips.append("--- --- --- --- ---")
-            packageTips.append("   cp -R ~/Development/git.id-design.com/whatsize7/WhatSize/release \(WEBSITE_REPO.path)/www.whatsizemac.com/software/whatsize7/")
-            packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz \(WEBSITE_REPO.path)/www.whatsizemac.com/software/whatsize7/\(packageFolder.lowercased()).tgz")
-            packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg \(WEBSITE_REPO.path)/www.whatsizemac.com/software/whatsize7/\(project.packageName.lowercased()).pkg")
+
+            packageTips.append("   cp -R \(project.sparkle.releaseURL.path)   \(WEBSITE_REPO.path)/www.whatsizemac.com/software/\(project.configName.lowercased())/")
+            packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz   \(WEBSITE_REPO.path)/www.whatsizemac.com/software/\(project.configName.lowercased())/\(packageFolder.lowercased()).tgz")
+            packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName)_DWARF.tgz   \(WEBSITE_REPO.path)/www.whatsizemac.com/software/\(project.configName.lowercased())/\(packageDwarfFolder.lowercased()).tgz")
+            packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg   \(WEBSITE_REPO.path)/www.whatsizemac.com/software/\(project.configName.lowercased())/\(project.packageName.lowercased()).pkg")
 
         } else if project.packageIdentifier.hasPrefix("com.other") {
             packageTips.append("")

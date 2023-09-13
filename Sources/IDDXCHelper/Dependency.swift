@@ -23,11 +23,21 @@ public struct Dependency {
     static let PRODUCT_BUILD = URL(fileURLWithPath: "/usr/bin/productbuild")
     static let PRODUCT_SIGN = URL(fileURLWithPath: "/usr/bin/productsign")
     static let CODE_SIGN_COMMAND = URL(fileURLWithPath: "/usr/bin/codesign")
-    static let XCODE_BUILD = URL(fileURLWithPath: "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild")
+
+    /**
+     make sure you are using xcode 14.2
+     xcode-select -p
+
+     update it if not
+     sudo xcode-select -s /Applications/Xcode14.app/Contents/Developer
+     sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+     */
+    static let XCODE_BUILD = URL(fileURLWithPath: "/usr/bin/xcodebuild")
     static let XCRUN = URL(fileURLWithPath: "/usr/bin/xcrun")
     static let XATTR = URL(fileURLWithPath: "/usr/bin/xattr")
     static let SUDO = URL(fileURLWithPath: "/usr/bin/sudo")
     static let DITTO = URL(fileURLWithPath: "/usr/bin/ditto")
+    static let TAR = URL(fileURLWithPath: "/usr/bin/tar")
 
     static let PACKAGES_ARCHIVE_ROOT = URL.home.appendingPathComponent("Desktop/Packages")
 
