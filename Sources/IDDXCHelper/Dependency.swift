@@ -29,7 +29,7 @@ public struct Dependency {
      xcode-select -p
 
      update it if not
-     sudo xcode-select -s /Applications/Xcode14.app/Contents/Developer
+     sudo xcode-select -s /Applications/Xcode15.app/Contents/Developer
      sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
      */
     static let XCODE_BUILD = URL(fileURLWithPath: "/usr/bin/xcodebuild")
