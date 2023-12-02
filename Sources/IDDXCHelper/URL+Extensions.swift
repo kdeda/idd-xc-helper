@@ -16,7 +16,7 @@ extension URL {
      Usually 10 alphanumeric characters.
      Your Apple ID may be a member of multiple teams.
      You can find Team IDs for teams you belong to by going to <https://developer.apple.com/account/#/membership>.
-     You cannot get information on Submission IDs created by another wwdr_team_id.
+     You cannot get information on Submission IDs created by another wwdr\_team\_id.
      
      https://scriptingosx.com/2021/07/notarize-a-command-line-tool-with-notarytool/
      
@@ -25,7 +25,7 @@ extension URL {
      # enter the password, this password should match the one we got from https://support.apple.com/en-us/HT204397
      # profile WhatSizeAppPassword
      # once the WhatSizeAppPassword is created we can just use it
-     /usr/bin/xcrun notarytool submit /Users/kdeda/Development/build/Package/WhatSize.pkg --keychain-profile WhatSizeAppPassword --wait
+     /usr/bin/xcrun notarytool submit /Users/kdeda/Developer/build/Package/WhatSize.pkg --keychain-profile WhatSizeAppPassword --wait
      */
     public func notarize(keychainProfile: String) {
         let arguments = [
@@ -43,7 +43,7 @@ extension URL {
          id: d6fa0c33-6da9-40cd-9797-427c32dc8fc1
          Successfully uploaded file21.8 MB of 21.9 MB)
          id: d6fa0c33-6da9-40cd-9797-427c32dc8fc1
-         path: /Users/kdeda/Development/build/Package/WhatSize.pkg
+         path: /Users/kdeda/Developer/build/Package/WhatSize.pkg
          Waiting for processing to complete.
          Current status: Accepted..........
          Processing complete
@@ -74,6 +74,7 @@ extension URL {
                 Log4swift[Self.self].info("log: '\(processOutput)'")
             }
 
+            Log4swift[Self.self].error("out: '\(processOutput)'")
             exit(0)
         }
         let uuid = uuid(tokens) ?? "UNKNOWN"

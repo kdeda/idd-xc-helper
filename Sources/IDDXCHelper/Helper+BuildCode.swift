@@ -18,18 +18,28 @@ extension Helper {
     private func build(workspace: Workspace) async {
         Log4swift[Self.self].info("building ...")
 
-        // More arguments can be passed here as "KEY=Value" type thing
-        // ie: GCC_PREPROCESSOR_DEFINITIONS="IDD_PTRACE=1"
-        // somehow escaping the DSTROOT results in odd ball issues
-        // so we will assume there are no spaces in them ...
-        //
+        /**
+         More arguments can be passed here as "KEY=Value" type thing
+         ie: GCC\_PREPROCESSOR\_DEFINITIONS="IDD\_PTRACE=1"
+         somehow escaping the DSTROOT results in odd ball issues
+         so we will assume there are no spaces in them ...
+
+         Starting on Xcode 15 puting . on the INSTALL\_PATH causes problems on a clean build
+         The work around is to have DSTROOT="/Users/kdeda/Developer/build"
+         and define INSTALL\_PATH=Release
+         All the products will be paced under /Users/kdeda/Developer/build/Release
+         */
+        let DSTROOT = (project.buildProductsURL.lastPathComponent == "Release")
+        ? project.buildProductsURL.deletingLastPathComponent().path
+        : project.buildProductsURL.path
+
         let process = Process(Dependency.XCODE_BUILD, [
             "-workspace", workspace.workspaceURL.path,
             "-scheme", workspace.scheme,
             "-configuration", "Release",
-            "DSTROOT=\(project.buildProductsURL.path)",
+            "DSTROOT=\(DSTROOT)",
             "DWARF_DSYM_FOLDER_PATH=\(project.buildProductsURL.path)",
-            "INSTALL_PATH=.",
+            "INSTALL_PATH=Release",
             "install"
         ])
 
@@ -89,7 +99,7 @@ extension Helper {
 
     /**
      This will blast the buildProductsURL folder.
-     Keep in mind the buildProductsURL points to where xcode will put the products. ie: '/Users/kdeda/Development/build/Release'
+     Keep in mind the buildProductsURL points to where xcode will put the products. ie: '/Users/kdeda/Developer/build/Release'
      But under it there might be other folders such as '../Intermediates.noindex' or '../Package'
      */
     public func buildCode() async {

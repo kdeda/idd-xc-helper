@@ -1,7 +1,7 @@
 {
     "configName" : "WhatSize7",
     "configURL" : "/tmp/run-time-generated",
-    "buildProductsURL" : "/~/Development/build/Release",
+    "buildProductsURL" : "/~/Developer/build/Release",
 
     "versionInfo" : {
         "bundleGetInfoString" : "Copyright© 1997-2022 id designs, inc.",
@@ -12,12 +12,12 @@
 
     "packageName" : "WhatSize",
     "packageIdentifier" : "com.id-design.v7.whatsize.pkg",
-    "packageRootURL" : "~/Development/build/Package",
+    "packageRootURL" : "~/Developer/build/Package",
     "productFiles" : [
         {
             "sourceURL" : "WhatSize.app",
             "destinationURL" : "Products/Applications",
-            "entitlementsURL" : "~/Development/git.id-design.com/whatsize7/WhatSize/WhatSize.entitlements",
+            "entitlementsURL" : "~/Developer/git.id-design.com/whatsize7/WhatSize/WhatSize.entitlements",
             "requiresSignature": true
         },
         {
@@ -34,14 +34,14 @@
     "workspaces" : [
         {
             "scheme" : "WhatSize",
-            "workspaceURL" : "~/Development/git.id-design.com/whatsize7/WhatSize.xcworkspace"
+            "workspaceURL" : "~/Developer/git.id-design.com/whatsize7/WhatSize.xcworkspace"
         }
     ],
     "pluginInfoPlistFiles" : [
     ],
     "infoPlistFiles" : [
-        "~/Development/git.id-design.com/whatsize7/WhatSize/Info.plist",
-        "~/Development/git.id-design.com/whatsize7/WhatSizeHelper/Info.plist"
+        "~/Developer/git.id-design.com/whatsize7/WhatSize/Info.plist",
+        "~/Developer/git.id-design.com/whatsize7/WhatSizeHelper/Info.plist"
     ],
     "keyChain" : {
         "developerIDApplication" : "Developer ID Application: ID-DESIGN INC. (ME637H7ZM9)",
@@ -52,6 +52,6 @@
         "companyName" : "ID-Design",
         "serverFileURL" : "file:///var/www/www.whatsizemac.com/software/whatsize7",
         "serverURL" : "https://www.whatsizemac.com/software/whatsize7",
-        "releaseURL" : "file:///~/Development/git.id-design.com/whatsize7/WhatSize/release"
+        "releaseURL" : "file:///~/Developer/git.id-design.com/whatsize7/WhatSize/release"
     }
 }

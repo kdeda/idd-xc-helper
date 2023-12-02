@@ -42,7 +42,7 @@ public struct Dependency {
     static let PACKAGES_ARCHIVE_ROOT = URL.home.appendingPathComponent("Desktop/Packages")
 
     // TODO: the following need to move out of here
-    static let INSTALLER_TOOLS = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools")
+    static let INSTALLER_TOOLS = URL.home.appendingPathComponent("Developer/git.id-design.com/installer_tools")
     static let TEST_ROOT = INSTALLER_TOOLS.appendingPathComponent("helpers/test_files")
     static let SPARKLE_SIGN = INSTALLER_TOOLS.appendingPathComponent("common/sparkle/sign_update")
 }

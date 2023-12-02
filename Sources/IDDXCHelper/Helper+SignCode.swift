@@ -46,7 +46,7 @@ extension Helper {
 
     // How to inspect entitlements
     // codesign -d --entitlements - [binary]
-    // /usr/bin/codesign --verify --verbose /Users/kdeda/Development/build/Debug/WhatSize.app
+    // /usr/bin/codesign --verify --verbose /Users/kdeda/Developer/build/Debug/WhatSize.app
     //
     private func signValidate(file fileURL: URL) throws -> URL {
         let output = Process.stdString(taskURL: Dependency.CODE_SIGN_COMMAND, arguments: ["--verify", "--verbose", fileURL.path])

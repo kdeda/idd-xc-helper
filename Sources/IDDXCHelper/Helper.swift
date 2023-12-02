@@ -117,7 +117,7 @@ public struct Helper {
     private func fixPermissions() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
-        let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/fixPackagePermissions.tcsh")
+        let script = URL.home.appendingPathComponent("Developer/git.id-design.com/installer_tools/common/scripts/fixPackagePermissions.tcsh")
         let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
         
         if output.range(of: "completed") == nil {
@@ -134,10 +134,10 @@ public struct Helper {
      pkgutil --expand "/Users/kdeda/Downloads/Install iTunes.pkg" "Install iTunes"
      we need to rework this flow to use apple's crap ...
 
-     cd /Users/kdeda/Development/build/Package
+     cd /Users/kdeda/Developer/build/Package
      pkgbuild --identifier com.id-design.v7.whatsize.pkg --version 7.7.3 --root ./BuildProducts --scripts ./Scripts --install-location / ./WhatSize.pkg
-     pkgbuild --analyze --root /Users/kdeda/Development/build/Release/WhatSize.app /Users/kdeda/Development/build/WhatSizeComponents.plist
-     pkgbuild --root /Users/kdeda/Development/build/Release/WhatSize.app --component-plist /Users/kdeda/Development/build/WhatSizeComponents.plist /Users/kdeda/Development/build/Package/WhatSize.pkg
+     pkgbuild --analyze --root /Users/kdeda/Developer/build/Release/WhatSize.app /Users/kdeda/Developer/build/WhatSizeComponents.plist
+     pkgbuild --root /Users/kdeda/Developer/build/Release/WhatSize.app --component-plist /Users/kdeda/Developer/build/WhatSizeComponents.plist /Users/kdeda/Developer/build/Package/WhatSize.pkg
      */
     private func makePackage() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
@@ -242,7 +242,7 @@ public struct Helper {
             Log4swift[Self.self].error("")
             exit(0)
         }
-        let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/chownExistingPackage.tcsh")
+        let script = URL.home.appendingPathComponent("Developer/git.id-design.com/installer_tools/common/scripts/chownExistingPackage.tcsh")
         let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path])
         
         if output.range(of: "completed") == nil {
@@ -335,7 +335,7 @@ public struct Helper {
 //        Log4swift[Self.self].info("\(tool) \(arguments.joined(separator: " "))")
 //        _ = Process.fetchString(taskURL: tool, arguments: arguments)
         
-        let diskImage = URL(fileURLWithPath: "/Users/cdeda/Development/backblaze/bzmono/www/java/clientdownload/bzinstall-mac-8.5.0.634-ca000.backblaze.com.dmg")
+        let diskImage = URL(fileURLWithPath: "/Users/cdeda/Developer/backblaze/bzmono/www/java/clientdownload/bzinstall-mac-8.5.0.634-ca000.backblaze.com.dmg")
         diskImage.notarize(keychainProfile: project.keyChain.keychainProfile)
         if !diskImage.xcrunStaplerStapleAndValidate {
             exit(0)
@@ -349,7 +349,7 @@ public struct Helper {
     private func compressPackage() {
         Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
 
-        let script = URL.home.appendingPathComponent("Development/git.id-design.com/installer_tools/common/scripts/compressPackage.tcsh")
+        let script = URL.home.appendingPathComponent("Developer/git.id-design.com/installer_tools/common/scripts/compressPackage.tcsh")
         let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
         if output.range(of: "completed") == nil {
             Log4swift[Self.self].error("\(output)")
@@ -493,7 +493,7 @@ public struct Helper {
         if project.packageIdentifier.hasPrefix("com.id-design") {
             let WEBSERVER_ROOT = "/var/www/www.whatsizemac.com/downloads"
             let WEBSITE_URL = "https://www.whatsizemac.com"
-            let WEBSITE_REPO = URL.home.appendingPathComponent("Development/git.id-design.com/website")
+            let WEBSITE_REPO = URL.home.appendingPathComponent("Developer/git.id-design.com/website")
 
             packageTips.append("")
             packageTips.append("")

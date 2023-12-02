@@ -30,7 +30,7 @@ public struct ProductFile: Codable {
     var sourceURL: URL      // ie: "WhatSize.app"
     
     /// Absolute path to where this needs to be copied at, in the Package or maybe DMG etc
-    var destinationURL: URL // ie:"~/Development/Products/Applications"
+    var destinationURL: URL // ie:"~/Developer/Products/Applications"
 
     /// For some apps we need to handle the `"*.entitlements"` file when signing them
     var entitlementsURL: URL?
@@ -57,7 +57,7 @@ public struct Sparkle: Codable {
     var serverURL: URL       // ie: "https://www.whatsizemac.com/software/whatsize7"
     
     // absolute file path to the sparkle release folder
-    var releaseURL: URL      // ie: "~/Development/git.id-design.com/whatsize7/WhatSize/release"
+    var releaseURL: URL      // ie: "~/Developer/git.id-design.com/whatsize7/WhatSize/release"
 }
 
 public struct Workspace: Codable {
@@ -65,7 +65,7 @@ public struct Workspace: Codable {
     var scheme: String     // ie: "WhatSize"
     
     // the workspace we are building from
-    var workspaceURL: URL  // ie: "~/Development/git.id-design.com/whatsize7/WhatSize.xcworkspace"
+    var workspaceURL: URL  // ie: "~/Developer/git.id-design.com/whatsize7/WhatSize.xcworkspace"
 }
 
 /**
