@@ -3,7 +3,7 @@
 //  xchelper
 //
 //  Created by Klajd Deda on 10/22/22.
-//  Copyright (C) 1997-2023 id-design, inc. All rights reserved.
+//  Copyright (C) 1997-2024 id-design, inc. All rights reserved.
 //
 
 import Foundation
@@ -92,6 +92,13 @@ public struct Project: Codable {
     var keyChain: KeyChain
     var sparkle: Sparkle
     var workspaces: [Workspace]
+    /// default is false, for older software such as whatsize7
+    /// when set to true, it will ignore any sparkel stuff for our custom CheckForUpdates Reducer
+    var iddCheckForUpdates: Bool
+    /// used when iddCheckForUpdates is set to true
+    /// this matches with the one on the WhatSize 8 target
+    /// not used with other code
+    var updateCipherPassword: String
 
     var pathToTGZ: URL {
         return packageRootURL.appendingPathComponent(packageName).appendingPathExtension("tgz")
@@ -115,4 +122,21 @@ public struct Project: Codable {
     var pathToPKG: URL {
         return packageRootURL.appendingPathComponent(packageName).appendingPathExtension("pkg")
     }
+
+    /**
+     Convenience:
+     ie: WhatSize\_8.0.9
+     */
+    var packageFolder: String {
+        packageName + "_" + versionInfo.bundleShortVersionString
+    }
+
+    /**
+     Convenience:
+     ie: WhatSize\_DWARF\_8.0.9
+     */
+    var packageDwarfFolder: String {
+        packageName + "_DWARF_" + versionInfo.bundleShortVersionString
+    }
+
 }

@@ -3,7 +3,7 @@
 //  xchelper
 //
 //  Created by Klajd Deda on 9/11/19.
-//  Copyright (C) 1997-2023 id-design, inc. All rights reserved.
+//  Copyright (C) 1997-2024 id-design, inc. All rights reserved.
 //
 
 import Foundation
@@ -345,37 +345,45 @@ public struct Helper {
     /**
      Since .pkgs are already compressed making a tar gz of them will not really compress anything.
      September 2023
+     This should not be used for any new software, especially whatsize8
      */
     private func compressPackage() {
         Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
 
-        let script = URL.home.appendingPathComponent("Developer/git.id-design.com/installer_tools/common/scripts/compressPackage.tcsh")
-        let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
-        if output.range(of: "completed") == nil {
-            Log4swift[Self.self].error("\(output)")
-            Log4swift[Self.self].error("")
-            Log4swift[Self.self].error("")
-            exit(0)
-        }
-        
-        let packageFolder = "\(project.packageName)_\(project.versionInfo.bundleShortVersionString)"
+        let packageFolder = project.packageFolder
         let desktopBaseURL = Dependency.PACKAGES_ARCHIVE_ROOT.appendingPathComponent(packageFolder)
-        
+
+        if !project.iddCheckForUpdates {
+            /**
+             This code is now legacy, as of WhatSize8 and our custom CheckForUpdates solution
+             */
+            let script = URL.home.appendingPathComponent("Developer/git.id-design.com/installer_tools/common/scripts/compressPackage.tcsh")
+            let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
+            if output.range(of: "completed") == nil {
+                Log4swift[Self.self].error("\(output)")
+                Log4swift[Self.self].error("")
+                Log4swift[Self.self].error("")
+                exit(0)
+            }
+
+            do {
+                let desktopURL = desktopBaseURL.appendingPathComponent(project.pathToTGZ.lastPathComponent)
+
+                _ = FileManager.default.removeItemIfExist(at: desktopURL)
+                try FileManager.default.copyItem(at: project.pathToTGZ, to: desktopURL)
+                Log4swift[Self.self].info("updated \(desktopURL.path)")
+            } catch {
+                Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
+            }
+        }
+
+        try? FileManager.default.removeItem(at: desktopBaseURL)
         FileManager.default.createDirectoryIfMissing(at: desktopBaseURL)
         do {
             let desktopURL = desktopBaseURL.appendingPathComponent(project.pathToPKG.lastPathComponent)
             
             _ = FileManager.default.removeItemIfExist(at: desktopURL)
             try FileManager.default.copyItem(at: project.pathToPKG, to: desktopURL)
-            Log4swift[Self.self].info("updated \(desktopURL.path)")
-        } catch {
-            Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
-        }
-        do {
-            let desktopURL = desktopBaseURL.appendingPathComponent(project.pathToTGZ.lastPathComponent)
-
-            _ = FileManager.default.removeItemIfExist(at: desktopURL)
-            try FileManager.default.copyItem(at: project.pathToTGZ, to: desktopURL)
             Log4swift[Self.self].info("updated \(desktopURL.path)")
         } catch {
             Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
@@ -438,24 +446,38 @@ public struct Helper {
     //
     public func updateSparkle() {
         Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
-        Log4swift[Self.self].info("notes_xml: '\(project.notes_xml)'")
-        do {
-            let fileURL = project.sparkle.releaseURL.appendingPathComponent("notes.xml")
-            try project.notes_xml.write(to: fileURL, atomically: true, encoding: .utf8)
-            Log4swift[Self.self].info("updated: '\(fileURL.path)'")
-        } catch {
-            Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
+
+        if !project.iddCheckForUpdates {
+            Log4swift[Self.self].info("notes_xml: '\(project.notes_xml)'")
+            do {
+                let fileURL = project.sparkle.releaseURL.appendingPathComponent("notes.xml")
+                try project.notes_xml.write(to: fileURL, atomically: true, encoding: .utf8)
+                Log4swift[Self.self].info("updated: '\(fileURL.path)'")
+            } catch {
+                Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
+            }
+
+
+            Log4swift[Self.self].info("sparklecast_xml: '\(project.sparklecast_xml)'")
+            do {
+                let fileURL = project.sparkle.releaseURL.appendingPathComponent("sparklecast.xml")
+                try project.sparklecast_xml.write(to: fileURL, atomically: true, encoding: .utf8)
+                Log4swift[Self.self].info("updated: '\(fileURL.path)'")
+            } catch {
+                Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
+            }
         }
-        
-        Log4swift[Self.self].info("sparklecast_xml: '\(project.sparklecast_xml)'")
-        do {
-            let fileURL = project.sparkle.releaseURL.appendingPathComponent("sparklecast.xml")
-            try project.sparklecast_xml.write(to: fileURL, atomically: true, encoding: .utf8)
-            Log4swift[Self.self].info("updated: '\(fileURL.path)'")
-        } catch {
-            Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
+
+        if project.iddCheckForUpdates {
+            do {
+                let fileURL = project.sparkle.releaseURL.appendingPathComponent("update.json")
+                try project.update_json.write(to: fileURL, atomically: true, encoding: .utf8)
+                Log4swift[Self.self].info("updated: '\(fileURL.path)'")
+            } catch {
+                Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
+            }
         }
-        
+
         if project.packageIdentifier.hasPrefix("com.id-design") {
             let phpInfo_xml: String = {
                 var rv = ""
@@ -486,13 +508,11 @@ public struct Helper {
     public func packageTips() {
         Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
 
-        let packageFolder = "\(project.packageName)_\(project.versionInfo.bundleShortVersionString)"
-        let packageDwarfFolder = "\(project.packageName)_DWARF_\(project.versionInfo.bundleShortVersionString)"
+        let packageFolder = project.packageFolder
+        let packageDwarfFolder = project.packageDwarfFolder
         var packageTips = [String]()
 
         if project.packageIdentifier.hasPrefix("com.id-design") {
-            let WEBSERVER_ROOT = "/var/www/www.whatsizemac.com/downloads"
-            let WEBSITE_URL = "https://www.whatsizemac.com"
             let WEBSITE_REPO = URL.home.appendingPathComponent("Developer/git.id-design.com/website")
 
             packageTips.append("")
@@ -500,12 +520,16 @@ public struct Helper {
             packageTips.append("# LIVE package upload ...")
             packageTips.append("# These commands will update the files DIRECTLY")
             packageTips.append("# Changes will happen immediately live, not recommended")
-            packageTips.append("\(WEBSITE_URL)/downloads/\(packageFolder.lowercased()).pkg")
             packageTips.append("--- --- --- --- ---")
-            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg   \(project.sparkle.sshUserName):\(WEBSERVER_ROOT)/\(packageFolder.lowercased()).pkg")
-            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz   \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL.path)/\(packageFolder.lowercased()).tgz")
-            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName)_DWARF.tgz   \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL.path)/\(packageDwarfFolder.lowercased()).tgz")
+
             packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg   \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL.path)/\(project.packageName.lowercased()).pkg")
+            if !project.iddCheckForUpdates {
+                packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz   \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL.path)/\(packageFolder.lowercased()).tgz")
+            } else {
+                packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg   \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL.path)/\(packageFolder.lowercased()).pkg")
+            }
+
+            packageTips.append(" # scp ~/Desktop/Packages/\(packageFolder)/\(project.packageName)_DWARF.tgz   \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL.path)/\(packageDwarfFolder.lowercased()).tgz")
             packageTips.append(" # scp -r \(project.sparkle.releaseURL.path)/   \(project.sparkle.sshUserName):\(project.sparkle.serverFileURL.path)/")
             packageTips.append("")
             packageTips.append("")
@@ -514,10 +538,15 @@ public struct Helper {
             packageTips.append("# When ready sync the live server with this repo to see Sparkle and WebSite changes ...")
             packageTips.append("--- --- --- --- ---")
 
-            packageTips.append("   cp -R \(project.sparkle.releaseURL.path)   \(WEBSITE_REPO.path)/www.whatsizemac.com/software/\(project.configName.lowercased())/")
-            packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz   \(WEBSITE_REPO.path)/www.whatsizemac.com/software/\(project.configName.lowercased())/\(packageFolder.lowercased()).tgz")
-            packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName)_DWARF.tgz   \(WEBSITE_REPO.path)/www.whatsizemac.com/software/\(project.configName.lowercased())/\(packageDwarfFolder.lowercased()).tgz")
             packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg   \(WEBSITE_REPO.path)/www.whatsizemac.com/software/\(project.configName.lowercased())/\(project.packageName.lowercased()).pkg")
+            if !project.iddCheckForUpdates {
+                packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).tgz   \(WEBSITE_REPO.path)/www.whatsizemac.com/software/\(project.configName.lowercased())/\(packageFolder.lowercased()).tgz")
+            } else {
+                packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName).pkg   \(WEBSITE_REPO.path)/www.whatsizemac.com/software/\(project.configName.lowercased())/\(packageFolder.lowercased()).pkg")
+            }
+
+            packageTips.append("   cp ~/Desktop/Packages/\(packageFolder)/\(project.packageName)_DWARF.tgz   \(WEBSITE_REPO.path)/www.whatsizemac.com/software/\(project.configName.lowercased())/\(packageDwarfFolder.lowercased()).tgz")
+            packageTips.append("   cp -R \(project.sparkle.releaseURL.path)   \(WEBSITE_REPO.path)/www.whatsizemac.com/software/\(project.configName.lowercased())/")
 
         } else if project.packageIdentifier.hasPrefix("com.other") {
             packageTips.append("")

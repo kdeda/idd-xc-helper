@@ -3,7 +3,7 @@
 //  xchelper
 //
 //  Created by Klajd Deda on 10/24/22.
-//  Copyright (C) 1997-2023 id-design, inc. All rights reserved.
+//  Copyright (C) 1997-2024 id-design, inc. All rights reserved.
 //
 
 import Foundation
@@ -37,6 +37,7 @@ extension Helper {
             "-workspace", workspace.workspaceURL.path,
             "-scheme", workspace.scheme,
             "-configuration", "Release",
+            "ONLY_ACTIVE_ARCH=NO", // for some reason xcode was building arm only
             "DSTROOT=\(DSTROOT)",
             "DWARF_DSYM_FOLDER_PATH=\(project.buildProductsURL.path)",
             "INSTALL_PATH=Release",

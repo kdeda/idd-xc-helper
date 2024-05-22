@@ -3,12 +3,13 @@
 //  xchelper
 //
 //  Created by Klajd Deda on 11/13/20.
-//  Copyright (C) 1997-2023 id-design, inc. All rights reserved.
+//  Copyright (C) 1997-2024 id-design, inc. All rights reserved.
 //
 
 import Foundation
 import Log4swift
 import IDDSwift
+import IDDSoftwareUpdate
 
 // MARK: - Project (Sparkle) -
 extension Project {
@@ -84,5 +85,46 @@ extension Project {
         rv += "    </channel>\n"
         rv += "</rss>\n"
         return rv
+    }
+
+    /**
+     The goal is to create the release/update.json file with data such that we can use it to detect
+     software updates on the client.
+
+     Since in theory someone can man in the middle to use their files we attempt to keep a valid signature
+     and a valid sha256 of the file we will eventually download using downloadURL.
+
+     At a latter day from the client side we will download the ../release/update.json from our website, which of course some can tamper with.
+
+     But if they change the contents of downloadURL or ../release/update.json, the signature validation on the client will fail.
+     */
+    var update_json: String {
+        let packageNameAndVersion = packageFolder.lowercased() + ".pkg"
+        let downloadURL = sparkle.serverURL.appendingPathComponent(packageNameAndVersion)
+        var update = UpdateInfo.init(
+            buildNumber: Int(versionInfo.bundleVersion) ?? 1010,
+            datePublished: Date(),
+            downloadByteCount: Int(self.pathToPKG.logicalSize),
+            downloadSHA256: self.pathToPKG.sha256,
+            downloadURL: downloadURL,
+            releaseNotesURL: sparkle.serverURL.appendingPathComponent("release/notes.html"),
+            shortVersion: versionInfo.bundleShortVersionString,
+            signature: updateCipherPassword // placeholder, hard to guess for someone willing to temper these
+        )
+
+        let jsonData = (try? UpdateInfo.jsonEncoder.encode(update)) ?? Data()
+        let json = String(data: jsonData, encoding: .utf8) ?? ""
+
+        update.signature = self.updatesCipher.encrypt(json)
+        let decrypted = self.updatesCipher.decrypt(update.signature)
+
+        if decrypted != json {
+            // should not get here
+            Log4swift[Self.self].error("failed to assert the signature. This should not happen.")
+        }
+
+        let jsonDataFinal = (try? UpdateInfo.jsonEncoder.encode(update)) ?? Data()
+        let jsonFinal = String(data: jsonDataFinal, encoding: .utf8) ?? ""
+        return jsonFinal
     }
 }

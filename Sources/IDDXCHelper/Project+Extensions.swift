@@ -3,7 +3,7 @@
 //  xchelper
 //
 //  Created by Klajd Deda on 4/12/20.
-//  Copyright (C) 1997-2023 id-design, inc. All rights reserved.
+//  Copyright (C) 1997-2024 id-design, inc. All rights reserved.
 //
 
 import Foundation
@@ -87,6 +87,10 @@ extension Project {
         return "kdeda@mac.com"
     }
     
+    var updatesCipher: Cipher {
+        return Cipher(password: updateCipherPassword, version: 1)
+    }
+
     var password: String {
         if packageIdentifier.hasPrefix("com.id-design") {
             return "@keychain:GATEKEEPER_IDD"
