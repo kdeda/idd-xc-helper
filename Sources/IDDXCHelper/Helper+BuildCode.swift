@@ -67,10 +67,10 @@ extension Helper {
 
         for await output in process.asyncOutput() {
             switch output {
-            case let .error(error):
+            case .error:
                 ()
                 // Log4swift[Self.self].info("error: '\(error)'")
-            case let .terminated(reason):
+            case .terminated:
                 ()
                 // Log4swift[Self.self].info("terminated: '\(reason)'")
             case let .stdout(data):

@@ -13,11 +13,7 @@ import IDDSwift
 extension Helper {
     private func removeSignature(file fileURL: URL) {
         let arguments = ["--remove-signature", fileURL.path]
-        do {
-            _ = try Process.stdString(taskURL: Dependency.CODE_SIGN_COMMAND, arguments: arguments)
-        } catch {
-            Log4swift[Self.self].info("error: \(error)")
-        }
+        _ = Process.stdString(taskURL: Dependency.CODE_SIGN_COMMAND, arguments: arguments)
     }
 
     @discardableResult
@@ -158,6 +154,11 @@ extension Helper {
                 .forEach { productFile in
                     if productFile.sourceURL.pathExtension == "app" {
                         Log4swift[Self.self].info("signApplication: '\(productFile.sourceURL.path)'")
+
+                        // remove xattr
+                        //
+                        _ = Process.stdString(taskURL: Dependency.XATTR, arguments: ["-cr", productFile.sourceURL.path])
+
                         signApplicationFrameworks(at: productFile.sourceURL)
                         signPlugins(at: productFile.sourceURL)
                         signLaunchServices(at: productFile.sourceURL)

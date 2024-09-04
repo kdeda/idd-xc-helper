@@ -19,6 +19,11 @@ public struct Dependency {
     // static let PACKAGES = URL(fileURLWithPath: "/usr/local/bin/packagesbuild")
     
     static let PACKAGE_BUILD = URL(fileURLWithPath: "/usr/bin/pkgbuild")
+    /**
+     https://keith.github.io/xcode-man-pages/pkgbuild.1.html
+
+     BundleHasStrictIdentifier to NO to replace existing with new bundle v8.whatsize
+     */
     static let PACKAGE_UTIL = URL(fileURLWithPath: "/usr/sbin/pkgutil")
     static let PRODUCT_BUILD = URL(fileURLWithPath: "/usr/bin/productbuild")
     static let PRODUCT_SIGN = URL(fileURLWithPath: "/usr/bin/productsign")

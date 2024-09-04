@@ -118,7 +118,7 @@ public struct Helper {
         Log4swift[Self.self].info("package: '\(project.configName)'")
         
         let script = URL.home.appendingPathComponent("Developer/git.id-design.com/installer_tools/common/scripts/fixPackagePermissions.tcsh")
-        let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path, project.packageName])
+        let output = Process.stdString(taskURL: Dependency.SUDO, arguments: [script.path])
         
         if output.range(of: "completed") == nil {
             Log4swift[Self.self].error("\(output)")
@@ -138,6 +138,8 @@ public struct Helper {
      pkgbuild --identifier com.id-design.v7.whatsize.pkg --version 7.7.3 --root ./BuildProducts --scripts ./Scripts --install-location / ./WhatSize.pkg
      pkgbuild --analyze --root /Users/kdeda/Developer/build/Release/WhatSize.app /Users/kdeda/Developer/build/WhatSizeComponents.plist
      pkgbuild --root /Users/kdeda/Developer/build/Release/WhatSize.app --component-plist /Users/kdeda/Developer/build/WhatSizeComponents.plist /Users/kdeda/Developer/build/Package/WhatSize.pkg
+
+     /usr/bin/pkgbuild --identifier com.id-design.v8.whatsize.pkg --version 8.1.1 --root /Users/kdeda/Developer/build/Package/Products --scripts /Users/kdeda/Developer/build/Debug/config/WhatSize8/Scripts --install-location / --component-plist /Users/kdeda/Developer/build/Debug/config/WhatSize8/component-list.plist /Users/kdeda/Developer/build/Package/WhatSizeUnsigned.pkg
      */
     private func makePackage() {
         Log4swift[Self.self].info("package: '\(project.configName)'")
@@ -228,6 +230,8 @@ public struct Helper {
     /**
      We we be creating the .pkg file from the binaries xreated earlier
      For this to work we depend on scripts that have been set to run as root automatically.
+
+     http://s.sudre.free.fr/Stuff/PackageMaker_Howto.html
      */
     public func createPackage() {
         let security = URL(fileURLWithPath: "/private/etc/sudoers.d/kdeda")

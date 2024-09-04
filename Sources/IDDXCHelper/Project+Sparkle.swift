@@ -109,7 +109,7 @@ extension Project {
             downloadURL: downloadURL,
             releaseNotesURL: sparkle.serverURL.appendingPathComponent("release/notes.html"),
             shortVersion: versionInfo.bundleShortVersionString,
-            signature: updateCipherPassword // placeholder, hard to guess for someone willing to temper these
+            signature: "" // placeholder, will be mutated to the proper value below
         )
 
         let jsonData = (try? UpdateInfo.jsonEncoder.encode(update)) ?? Data()
