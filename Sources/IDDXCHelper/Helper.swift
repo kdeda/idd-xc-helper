@@ -451,25 +451,23 @@ public struct Helper {
     public func updateSparkle() {
         Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
 
-        if !project.iddCheckForUpdates {
-            Log4swift[Self.self].info("notes_xml: '\(project.notes_xml)'")
-            do {
-                let fileURL = project.sparkle.releaseURL.appendingPathComponent("notes.xml")
-                try project.notes_xml.write(to: fileURL, atomically: true, encoding: .utf8)
-                Log4swift[Self.self].info("updated: '\(fileURL.path)'")
-            } catch {
-                Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
-            }
+        Log4swift[Self.self].info("notes_xml: '\(project.notes_xml)'")
+        do {
+            let fileURL = project.sparkle.releaseURL.appendingPathComponent("notes.xml")
+            try project.notes_xml.write(to: fileURL, atomically: true, encoding: .utf8)
+            Log4swift[Self.self].info("updated: '\(fileURL.path)'")
+        } catch {
+            Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
+        }
 
 
-            Log4swift[Self.self].info("sparklecast_xml: '\(project.sparklecast_xml)'")
-            do {
-                let fileURL = project.sparkle.releaseURL.appendingPathComponent("sparklecast.xml")
-                try project.sparklecast_xml.write(to: fileURL, atomically: true, encoding: .utf8)
-                Log4swift[Self.self].info("updated: '\(fileURL.path)'")
-            } catch {
-                Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
-            }
+        Log4swift[Self.self].info("sparklecast_xml: '\(project.sparklecast_xml)'")
+        do {
+            let fileURL = project.sparkle.releaseURL.appendingPathComponent("sparklecast.xml")
+            try project.sparklecast_xml.write(to: fileURL, atomically: true, encoding: .utf8)
+            Log4swift[Self.self].info("updated: '\(fileURL.path)'")
+        } catch {
+            Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
         }
 
         if project.iddCheckForUpdates {

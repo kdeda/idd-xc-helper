@@ -27,7 +27,8 @@ public struct Tool {
     }
 
     private func validate(projectURL: inout URL) {
-        Log4swift.configure(appName: toolName)
+        let logRootURL = URL.home.appendingPathComponent("Library/Logs/IDDXCHelper")
+        Log4swift.configure(fileLogConfig: try? .init(logRootURL: logRootURL, appPrefix: "IDDXCHelper", appSuffix: "", daysToKeep: 30))
 
         /**
          We need to provide the path to the Project.json for this work

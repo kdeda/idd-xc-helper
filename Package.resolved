@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kdeda/idd-alert.git",
       "state" : {
-        "revision" : "f3f29546ef01d97438fb33a0dc5281d316fb7864",
-        "version" : "1.0.8"
+        "revision" : "c431df85b3ba367247b774c9b3432da7f94b6427",
+        "version" : "1.1.0"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kdeda/idd-log4-swift.git",
       "state" : {
-        "revision" : "dcdcad8f7666f58302616962688934310000d7a9",
-        "version" : "2.1.0"
+        "revision" : "ad8bcf482eefe31ed6d74691bdcf321ac89d8541",
+        "version" : "2.1.7"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kdeda/idd-softwareupdate.git",
       "state" : {
-        "revision" : "35e6150d07d332cd73f53009590ff9d251d79f1b",
-        "version" : "1.0.7"
+        "revision" : "ff11402fb564474d1a3d6d06baac147639753874",
+        "version" : "1.1.2"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kdeda/idd-swift.git",
       "state" : {
-        "revision" : "78336e127b642ec54fa09e1052fb64ddc95ad9f1",
-        "version" : "2.3.4"
+        "revision" : "d51bf11e0b30442bc538c21dcdae3f3d03e9e234",
+        "version" : "2.3.8"
       }
     },
     {
@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kdeda/idd-swiftui.git",
       "state" : {
-        "revision" : "b0cbc2309fa83e000923dcf4d1db5fd259ac191f",
-        "version" : "2.1.4"
+        "revision" : "b7e2401835c905f16d55884be7b0530e67e316c7",
+        "version" : "2.1.6"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
-        "revision" : "121b6080697b5457ac63e37d2f2d97cf5acd999a",
-        "version" : "1.13.1"
+        "revision" : "8013f1a72af8ccb2b1735d7aed831a8dc07c6fd0",
+        "version" : "1.15.0"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-concurrency-extras",
       "state" : {
-        "revision" : "bb5059bde9022d69ac516803f4f227d8ac967f71",
-        "version" : "1.1.0"
+        "revision" : "6054df64b55186f08b6d0fd87152081b8ad8d613",
+        "version" : "1.2.0"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-crypto.git",
       "state" : {
-        "revision" : "60f13f60c4d093691934dc6cfdf5f508ada1f894",
-        "version" : "2.6.0"
+        "revision" : "ffca28be3c9c6a86a579949d23f68818a4b9b5d8",
+        "version" : "3.8.0"
       }
     },
     {
@@ -131,8 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-dependencies",
       "state" : {
-        "revision" : "21660b042cd8fd0bdd45cc39050cacd4e91a63a4",
-        "version" : "1.3.8"
+        "revision" : "0fc0255e780bf742abeef29dec80924f5f0ae7b9",
+        "version" : "1.4.1"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-navigation",
       "state" : {
-        "revision" : "e834b3760731160d7d448509ee6a1408c8582a6b",
-        "version" : "2.2.0"
+        "revision" : "16a27ab7ae0abfefbbcba73581b3e2380b47a579",
+        "version" : "2.2.2"
       }
     },
     {
@@ -181,21 +181,12 @@
       }
     },
     {
-      "identity" : "swiftui-navigation",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swiftui-navigation",
-      "state" : {
-        "revision" : "e628806aeaa9efe25c1abcd97931a7c498fab281",
-        "version" : "1.5.5"
-      }
-    },
-    {
       "identity" : "xctest-dynamic-overlay",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "96beb108a57f24c8476ae1f309239270772b2940",
-        "version" : "1.2.5"
+        "revision" : "770f990d3e4eececb57ac04a6076e22f8c97daeb",
+        "version" : "1.4.2"
       }
     }
   ],
