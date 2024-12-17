@@ -1,6 +1,6 @@
 //
 //  Helper.swift
-//  xchelper
+//  idd-xc-helper
 //
 //  Created by Klajd Deda on 9/11/19.
 //  Copyright (C) 1997-2024 id-design, inc. All rights reserved.
@@ -13,7 +13,7 @@ import IDDSwift
 /**
  Implementations for each HelperAction
  */
-public struct Helper {
+public struct Helper: Sendable {
     var project: Project
     
     // MARK: - Private methods -
@@ -404,38 +404,35 @@ public struct Helper {
     }
 
     /**
-     Will make a tar/gz of the .dSYM files for this project.
-     Each .dSYM binary will be placed in a folder called ../Package/{project.packageName}DWARF
-     which will than be compressed into a {project.packageName}_DWARF.tgz
+     There should be a folder with all the dsyms for this build under
+     /Users/kdeda/Developer/build/Release/dSYM
+
+     We will tar gz that folder to `/Users/kdeda/Developer/build/Package/WhatSize_DWARF.tgz`
+
      This allows for crash symbolication when a user crashes :-)
      */
     private func createDWARFPayload() {
+        let source = project.buildProductsURL.appendingPathComponent("dSYM")
         let dwarfArchive = project.packageName.appending("_DWARF")
-        let dSYMRoot = project.packageRootURL.appendingPathComponent(dwarfArchive)
-        if !dSYMRoot.fileExist {
-            FileManager.default.createDirectoryIfMissing(at: dSYMRoot)
-            Log4swift[Self.self].info("created: '\(dSYMRoot.path)'")
-        }
-        project.productFiles.forEach { productFile in
-            do {
-                let destinationURL = dSYMRoot.appendingPathComponent(productFile.sourceURL.lastPathComponent).appendingPathExtension("dSYM")
-                let sourceURL = productFile.sourceURL.appendingPathExtension("dSYM")
-                if sourceURL.fileExist {
-                    try FileManager.default.copyItem(atPath: sourceURL.path, toPath: destinationURL.path)
-                    let relativePath = destinationURL.path.substring(after: project.packageRootURL.path) ?? "unknown"
+        let destination = project.packageRootURL.appendingPathComponent(dwarfArchive)
 
-                    Log4swift[Self.self].info("copy: '\(sourceURL.path)' to: '..\(relativePath)'")
-                }
-            } catch {
-                Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
-            }
+        do {
+            try FileManager.default.copyItem(at: source, to: destination)
+            Log4swift[Self.self].info("copyItem at: '\(source.path)' to: '\(destination.path)'")
+
+            try? FileManager.default.removeItem(at: destination.appendingPathComponent("CasePathsMacros.dSYM"))
+            try? FileManager.default.removeItem(at: destination.appendingPathComponent("ComposableArchitectureMacros.dSYM"))
+            try? FileManager.default.removeItem(at: destination.appendingPathComponent("DependenciesMacrosPlugin.dSYM"))
+            try? FileManager.default.removeItem(at: destination.appendingPathComponent("PerceptionMacros.dSYM"))
+
+            _ = Process(Dependency.TAR, ["zcf", dwarfArchive.appending(".tgz"), dwarfArchive])
+                .currentDir(project.packageRootURL)
+                .stdString()
+        } catch {
+            Log4swift[Self.self].error("error: '\(error.localizedDescription)'")
         }
 
-        _ = Process(Dependency.TAR, ["zcf", dwarfArchive.appending(".tgz"), dwarfArchive])
-            .currentDir(project.packageRootURL)
-            .stdString()
-
-        let dwarfURL = project.packageRootURL.appendingPathComponent(dwarfArchive.appending(".tgz"))
+        let dwarfURL = destination.appendingPathExtension("tgz")
         guard dwarfURL.fileExist
         else {
             Log4swift[Self.self].error("failed to create: '\(dwarfURL.path)'")

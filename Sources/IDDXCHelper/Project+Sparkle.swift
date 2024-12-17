@@ -1,6 +1,6 @@
 //
 //  Project+Sparkle.swift
-//  xchelper
+//  idd-xc-helper
 //
 //  Created by Klajd Deda on 11/13/20.
 //  Copyright (C) 1997-2024 id-design, inc. All rights reserved.
@@ -105,7 +105,7 @@ extension Project {
             buildNumber: Int(versionInfo.bundleVersion) ?? 1010,
             datePublished: Date(),
             downloadByteCount: Int(self.pathToPKG.logicalSize),
-            downloadSHA256: self.pathToPKG.sha256,
+            downloadSHA256: self.pathToPKG.sha256With68Chars,
             downloadURL: downloadURL,
             releaseNotesURL: sparkle.serverURL.appendingPathComponent("release/notes.html"),
             shortVersion: versionInfo.bundleShortVersionString,

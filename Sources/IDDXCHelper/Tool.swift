@@ -1,6 +1,6 @@
 //
 //  Tool.swift
-//  xchelper
+//  idd-xc-helper
 //
 //  Created by Klajd Deda on 10/25/22.
 //  Copyright (C) 1997-2024 id-design, inc. All rights reserved.

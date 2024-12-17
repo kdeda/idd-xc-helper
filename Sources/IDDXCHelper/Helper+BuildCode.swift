@@ -1,6 +1,6 @@
 //
 //  Helper+BuildCode.swift
-//  xchelper
+//  idd-xc-helper
 //
 //  Created by Klajd Deda on 10/24/22.
 //  Copyright (C) 1997-2024 id-design, inc. All rights reserved.
@@ -37,9 +37,10 @@ extension Helper {
             "-workspace", workspace.workspaceURL.path,
             "-scheme", workspace.scheme,
             "-configuration", "Release",
+            "-derivedDataPath", "\(project.buildProductsURL.path)/DerivedData",
             "ONLY_ACTIVE_ARCH=NO", // for some reason xcode was building arm only
             "DSTROOT=\(DSTROOT)",
-            "DWARF_DSYM_FOLDER_PATH=\(project.buildProductsURL.path)",
+            "DWARF_DSYM_FOLDER_PATH=\(project.buildProductsURL.path)/dSYM",
             "INSTALL_PATH=Release",
             "install"
         ])

@@ -1,6 +1,6 @@
 //
 //  Configuration.swift
-//  xchelper
+//  idd-xc-helper
 //
 //  Created by Klajd Deda on 10/22/22.
 //  Copyright (C) 1997-2024 id-design, inc. All rights reserved.
@@ -8,14 +8,14 @@
 
 import Foundation
 
-public struct VersionInfo: Codable {
+public struct VersionInfo: Codable, Sendable {
     var bundleGetInfoString: String
     var bundleShortVersionString: String
     var bundleVersion: String
     var humanReadableCopyright: String
 }
 
-public struct ProductFile: Codable {
+public struct ProductFile: Codable, Sendable {
     enum CodingKeys: String, CodingKey {
         case sourceURL = "sourceURL"
         case destinationURL = "destinationURL"
@@ -39,13 +39,13 @@ public struct ProductFile: Codable {
     var requiresSignature: Bool
 }
 
-public struct KeyChain: Codable {
+public struct KeyChain: Codable, Sendable {
     let developerIDApplication: String  // ie: '"Developer ID Application: ID-DESIGN INC. (ME637H7ZM9)"'
     let developerIDInstall: String      // ie: '"Developer ID Installer: ID-DESIGN INC. (ME637H7ZM9)"'
     let keychainProfile: String         // See: URL.notarize(keychainProfile:) for more info
 }
 
-public struct Sparkle: Codable {
+public struct Sparkle: Codable, Sendable {
     // the sshUserName on the remote apache server
     var sshUserName: String  // ie: "kdeda@id-design.com"
     var companyName: String  // ie: "ID-Design"
@@ -60,7 +60,7 @@ public struct Sparkle: Codable {
     var releaseURL: URL      // ie: "~/Developer/git.id-design.com/whatsize7/WhatSize/release"
 }
 
-public struct Workspace: Codable {
+public struct Workspace: Codable, Sendable {
     // the scheme we are building
     var scheme: String     // ie: "WhatSize"
     
@@ -72,7 +72,7 @@ public struct Workspace: Codable {
  This code is data driven by what's here.
  Each project shall have a json config with various settings.
  */
-public struct Project: Codable {
+public struct Project: Codable, Sendable {
     ///  Name of this project as defined in the configURL .json configuration payload
     var configName: String
     
