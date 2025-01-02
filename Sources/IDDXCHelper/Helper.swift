@@ -3,7 +3,7 @@
 //  idd-xc-helper
 //
 //  Created by Klajd Deda on 9/11/19.
-//  Copyright (C) 1997-2024 id-design, inc. All rights reserved.
+//  Copyright (C) 1997-2025 id-design, inc. All rights reserved.
 //
 
 import Foundation
@@ -206,11 +206,6 @@ public struct Helper: Sendable {
         self.project = Project(configURL: configURL)!
     }
 
-    public func actionDivider(method: String = #function) -> String {
-        let logMessage = "<IDDXCHelper.Helper \(method)>   package: '\(project.configName)'"
-        return "\n" + Array(repeating: "-", count: 42 + logMessage.count).joined(separator: "")
-    }
-
     public func handleAction(_ action: HelperAction) async -> Helper {
         switch action {
         case .updateVersions: updateVersions()
@@ -236,7 +231,9 @@ public struct Helper: Sendable {
     public func createPackage() {
         let security = URL(fileURLWithPath: "/private/etc/sudoers.d/kdeda")
 
-        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+        Log4swift[Self.self].info("")
+        Log4swift[Self.self].info("package: '\(project.configName)'")
+        Log4swift[Self.self].dash("package: '\(project.configName)'")
 
         if !security.fileExist {
             Log4swift[Self.self].error("Please create: '\(security.path)'")
@@ -274,7 +271,9 @@ public struct Helper: Sendable {
     }
     
     public func notarizePackage() {
-        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+        Log4swift[Self.self].info("")
+        Log4swift[Self.self].dash("package: '\(project.configName)'")
+        Log4swift[Self.self].info("package: '\(project.configName)'")
 
         let pkgFile = project.pathToPKG
         pkgFile.notarize(keychainProfile: project.keyChain.keychainProfile)
@@ -290,7 +289,8 @@ public struct Helper: Sendable {
      */
     //
     public func notarizeApp() {
-        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+        Log4swift[Self.self].info("package: '\(project.configName)'")
+        Log4swift[Self.self].dash("package: '\(project.configName)'")
 
         guard let productFile = project.productFiles.filter(\.requiresSignature).first
         else {
@@ -324,7 +324,9 @@ public struct Helper: Sendable {
      */
     // TODO: Fix me ...
     public func notarizeDMG() {
-        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+        Log4swift[Self.self].info("")
+        Log4swift[Self.self].dash("package: '\(project.configName)'")
+        Log4swift[Self.self].info("package: '\(project.configName)'")
 
 //        let apps = project.productFilesToSign.map(Config.BUILD_SOURCE.appendingPathComponent)
 //        guard let appPath = apps.first
@@ -352,7 +354,9 @@ public struct Helper: Sendable {
      This should not be used for any new software, especially whatsize8
      */
     private func compressPackage() {
-        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+        Log4swift[Self.self].info("")
+        Log4swift[Self.self].dash("package: '\(project.configName)'")
+        Log4swift[Self.self].info("package: '\(project.configName)'")
 
         let packageFolder = project.packageFolder
         let desktopBaseURL = Dependency.PACKAGES_ARCHIVE_ROOT.appendingPathComponent(packageFolder)
@@ -446,7 +450,9 @@ public struct Helper: Sendable {
     // shall be called after compressPackage
     //
     public func updateSparkle() {
-        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+        Log4swift[Self.self].info("")
+        Log4swift[Self.self].dash("package: '\(project.configName)'")
+        Log4swift[Self.self].info("package: '\(project.configName)'")
 
         Log4swift[Self.self].info("notes_xml: '\(project.notes_xml)'")
         do {
@@ -505,7 +511,9 @@ public struct Helper: Sendable {
     }
     
     public func packageTips() {
-        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+        Log4swift[Self.self].info("")
+        Log4swift[Self.self].dash("package: '\(project.configName)'")
+        Log4swift[Self.self].info("package: '\(project.configName)'")
 
         let packageFolder = project.packageFolder
         let packageDwarfFolder = project.packageDwarfFolder

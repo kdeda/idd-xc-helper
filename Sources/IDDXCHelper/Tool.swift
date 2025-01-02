@@ -3,7 +3,7 @@
 //  idd-xc-helper
 //
 //  Created by Klajd Deda on 10/25/22.
-//  Copyright (C) 1997-2024 id-design, inc. All rights reserved.
+//  Copyright (C) 1997-2025 id-design, inc. All rights reserved.
 //
 
 import Foundation
@@ -27,9 +27,6 @@ public struct Tool {
     }
 
     private func validate(projectURL: inout URL) {
-        let logRootURL = URL.home.appendingPathComponent("Library/Logs/IDDXCHelper")
-        Log4swift.configure(fileLogConfig: try? .init(logRootURL: logRootURL, appPrefix: "IDDXCHelper", appSuffix: "", daysToKeep: 30))
-
         /**
          We need to provide the path to the Project.json for this work
          The trick here is to provide a CopyFiles step on the Xcode xchelper target
@@ -71,7 +68,7 @@ public struct Tool {
             exit(0)
         }
 
-        Log4swift["main"].info("--------------------------------")
+        Log4swift["main"].dash("-config '\(config)' projectURL: '\(projectURL.path)'")
         Log4swift["main"].info("-config '\(config)' projectURL: '\(projectURL.path)'")
 
         /// make sure we have full disk access

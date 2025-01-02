@@ -3,7 +3,7 @@
 //  idd-xc-helper
 //
 //  Created by Klajd Deda on 10/24/22.
-//  Copyright (C) 1997-2024 id-design, inc. All rights reserved.
+//  Copyright (C) 1997-2025 id-design, inc. All rights reserved.
 //
 
 import Foundation
@@ -40,7 +40,9 @@ extension Helper {
     }
 
     public func updateVersions() {
-        Log4swift[Self.self].info("package: '\(project.configName)' \(actionDivider())")
+        Log4swift[Self.self].info("")
+        Log4swift[Self.self].dash("package: '\(project.configName)'")
+        Log4swift[Self.self].info("package: '\(project.configName)'")
 
         project.infoPlistFiles.forEach(updateInfo(at:))
     }

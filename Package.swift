@@ -15,7 +15,7 @@ let package = Package(
     ],
     dependencies: [
         // .package(name: "idd-softwareupdate", path: "../idd-softwareupdate"),
-        .package(url: "https://github.com/kdeda/idd-softwareupdate.git", from: "1.1.7")
+        .package(url: "https://github.com/kdeda/idd-softwareupdate.git", from: "2.1.2")
     ],
     targets: [
         .target(
