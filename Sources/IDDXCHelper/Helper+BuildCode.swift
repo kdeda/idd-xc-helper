@@ -51,7 +51,8 @@ extension Helper {
         let fileHandle: FileHandle? = {
             // the file shall be reset to zero ...
             try? "".write(to: logFile, atomically: true, encoding: .utf8)
-            Log4swift[Self.self].info("to see log details\n tail -f '\(logFile.path)'")
+            Log4swift[Self.self].dash("to see log details")
+            Log4swift[Self.self].info("to see log details\n\t tail -f '\(logFile.path)'\n")
 
             let rv = try? FileHandle(forWritingTo: logFile)
             _ = try? rv?.seekToEnd()

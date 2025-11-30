@@ -206,22 +206,6 @@ public struct Helper: Sendable {
         self.project = Project(configURL: configURL)!
     }
 
-    public func handleAction(_ action: HelperAction) async -> Helper {
-        switch action {
-        case .updateVersions: updateVersions()
-        case .buildCode: await buildCode()
-        case .signCode: signCode()
-        case .createPackage: createPackage()
-        case .notarizePackage: notarizePackage()
-        case .updateSparkle: updateSparkle()
-        case .packageTips: packageTips()
-
-        case .notarizeApp: notarizeApp()
-        case .notarizeDMG: notarizeDMG()
-        }
-        return self
-    }
-
     /**
      We we be creating the .pkg file from the binaries xreated earlier
      For this to work we depend on scripts that have been set to run as root automatically.
