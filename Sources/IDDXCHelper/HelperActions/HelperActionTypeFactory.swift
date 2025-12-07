@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import Log4swift
 
-public protocol HelperAction {
+public protocol HelperAction: Sendable {
     var type: HelperActionType { get }
     func runCommand() async
 }
@@ -16,9 +17,11 @@ public protocol HelperAction {
 public extension UserDefaults {
     static func hasActionType(_ type: HelperActionType) -> Bool {
         let actions = (UserDefaults.standard.string(forKey: "actions") ?? "")
-            .replacingOccurrences(of: " ", with: "")
+
+        // Log4swift[Self.self].info("actions: '\(actions)'")
+        let rv = actions.replacingOccurrences(of: " ", with: "")
             .components(separatedBy: ",")
-        return actions.contains(type.rawValue)
+        return rv.contains(type.rawValue)
     }
 }
 

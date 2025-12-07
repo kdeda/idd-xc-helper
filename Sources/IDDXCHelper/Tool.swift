@@ -37,11 +37,8 @@ public struct Tool {
         let config = UserDefaults.standard.string(forKey: "config") ?? ""
         guard knownConfigs.contains(config)
         else {
-            let toolName = Bundle.main.executableURL!.lastPathComponent
-
-            Log4swift["main"].info("usage: '\(toolName) -config [\(knownConfigs.joined(separator: " | "))]'")
-            Log4swift["main"].info("       you provided an invalid config value: '\(config)'")
-            Log4swift["main"].info("       valid configs are: '\(knownConfigs.joined(separator: " | "))'")
+            Log4swift[Self.self].error("you provided an invalid config value: '\(config)'")
+            Log4swift[Self.self].error("valid configs are: '\(knownConfigs.joined(separator: " | "))'")
             return nil
         }
 
@@ -49,15 +46,12 @@ public struct Tool {
             .deletingLastPathComponent().appendingPathComponent("config/\(config)/Project.json")
         guard projectURL.fileExist
         else {
-            let toolName = Bundle.main.executableURL!.lastPathComponent
-
-            Log4swift["main"].info("usage: '\(toolName) -config [\(knownConfigs.joined(separator: " | "))]'")
-            Log4swift["main"].info("       valid configs are: '\(knownConfigs.joined(separator: " | "))'")
+            Log4swift[Self.self].error("we could not find: '\(projectURL.path)'")
             return nil
         }
 
-        Log4swift["main"].dash("-config '\(config)' projectURL: '\(projectURL.path)'")
-        Log4swift["main"].info("-config '\(config)' projectURL: '\(projectURL.path)'")
+        Log4swift[Self.self].dash("-config '\(config)' projectURL: '\(projectURL.path)'")
+        Log4swift[Self.self].info("-config '\(config)' projectURL: '\(projectURL.path)'")
 
         /// make sure we have full disk access
         guard FileManager.default.hasFullDiskAccess
